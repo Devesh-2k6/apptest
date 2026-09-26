@@ -8,6 +8,7 @@ import {
   Trash2,
   CheckCircle2,
   Clock,
+  Calendar,
   AlertTriangle,
   Layers,
   X,
@@ -15,6 +16,8 @@ import {
   Refrigerator,
   Camera,
   ScanLine,
+  Leaf,
+  Star,
 } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 import {
@@ -173,12 +176,12 @@ export default function PantryPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-slate-900/60 p-6 rounded-2xl border border-slate-800 backdrop-blur-xl">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400">
+            <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
               <Refrigerator size={26} />
             </div>
             <div>
               <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
-                My Digital Fridge <Sparkles size={18} className="text-orange-400" />
+                My Digital Fridge <Sparkles size={18} className="text-purple-400" />
               </h1>
               <p className="text-xs sm:text-sm text-slate-400">
                 AI-Powered Home Pantry & Expiry Countdown Tracker
@@ -189,14 +192,14 @@ export default function PantryPage() {
           <div className="flex items-center gap-2.5 w-full sm:w-auto">
             <button
               onClick={() => setAddModalOpen(true)}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold transition-all shadow-lg shadow-orange-500/20"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold transition-all shadow-lg shadow-purple-500/20"
             >
               <Plus size={16} /> Add Item
             </button>
             <button
               onClick={handleGenerateRecipe}
               disabled={cooking}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 text-xs font-bold transition-all"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-300 hover:bg-purple-500/20 text-xs font-bold transition-all"
             >
               <ChefHat size={16} /> {cooking ? "Cooking..." : "AI Fridge Recipe"}
             </button>
@@ -238,15 +241,19 @@ export default function PantryPage() {
           {loading ? (
             <div className="text-center py-16 text-slate-500 text-sm">Loading your digital fridge...</div>
           ) : items.length === 0 ? (
-            <div className="text-center py-16 bg-slate-900/30 rounded-2xl border border-slate-800/80 p-8 space-y-3">
-              <div className="text-4xl">🧊</div>
-              <h4 className="text-base font-bold text-slate-200">Your Digital Fridge is Empty</h4>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                Items you reserve on Meeva or add manually will automatically track their expiration countdowns here.
-              </p>
+            <div className="text-center py-16 bg-slate-900/30 rounded-2xl border border-slate-800/80 p-8 space-y-4">
+              <div className="w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mx-auto shadow-inner shadow-purple-500/5">
+                <Refrigerator size={30} />
+              </div>
+              <div>
+                <h4 className="text-base font-bold text-slate-200">Your Digital Fridge is Empty</h4>
+                <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">
+                  Items you reserve on Meeva or add manually will automatically track their expiration countdowns here.
+                </p>
+              </div>
               <button
                 onClick={() => setAddModalOpen(true)}
-                className="mt-2 inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-md shadow-purple-500/20"
               >
                 <Plus size={16} /> Add First Item
               </button>
@@ -283,12 +290,20 @@ export default function PantryPage() {
                           {item.category}
                         </span>
                       </div>
-                      <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${colorClass}`}>
-                        {item.hours_left <= 0
-                          ? "Expired"
-                          : item.hours_left <= 24
-                          ? `⏱️ ${Math.round(item.hours_left)}h Left`
-                          : `📅 ${item.days_left}d Left`}
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border flex items-center gap-1.5 ${colorClass}`}>
+                        {item.hours_left <= 0 ? (
+                          <span>Expired</span>
+                        ) : item.hours_left <= 24 ? (
+                          <>
+                            <Clock size={12} className="shrink-0" />
+                            <span>{Math.round(item.hours_left)}h Left</span>
+                          </>
+                        ) : (
+                          <>
+                            <Calendar size={12} className="shrink-0" />
+                            <span>{item.days_left}d Left</span>
+                          </>
+                        )}
                       </span>
                     </div>
 
@@ -329,9 +344,9 @@ export default function PantryPage() {
             </div>
 
             {/* Gap #17: Web Camera & Barcode Scanner */}
-            <div className="p-3 rounded-xl bg-slate-950 border border-dashed border-orange-500/40 flex items-center justify-between">
+            <div className="p-3 rounded-xl bg-slate-950 border border-dashed border-purple-500/40 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-lg bg-orange-500/10 text-orange-400">
+                <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400">
                   <Camera size={18} />
                 </div>
                 <div>
@@ -339,7 +354,7 @@ export default function PantryPage() {
                   <p className="text-[10px] text-slate-400">Snap product label to auto-fill</p>
                 </div>
               </div>
-              <label className="px-3 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shrink-0">
+              <label className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shrink-0">
                 {scanning ? "Scanning..." : "Snap / Upload"}
                 <input
                   type="file"
@@ -361,7 +376,7 @@ export default function PantryPage() {
                   placeholder="e.g., Organic Milk, Fresh Bread, Paneer"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-orange-500"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-purple-500"
                 />
               </div>
 
@@ -373,7 +388,7 @@ export default function PantryPage() {
                     placeholder="1 Litre, 500g"
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-orange-500"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-purple-500"
                   />
                 </div>
                 <div>
@@ -383,7 +398,7 @@ export default function PantryPage() {
                     min="1"
                     value={daysLeft}
                     onChange={(e) => setDaysLeft(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-orange-500"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-purple-500"
                   />
                 </div>
               </div>
@@ -398,7 +413,7 @@ export default function PantryPage() {
                       onClick={() => setCategory(cat)}
                       className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
                         category === cat
-                          ? "bg-orange-500 text-white"
+                          ? "bg-purple-600 text-white"
                           : "bg-slate-950 text-slate-400 border border-slate-800 hover:text-white"
                       }`}
                     >
@@ -411,7 +426,7 @@ export default function PantryPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg shadow-orange-500/20"
+                className="w-full mt-4 bg-gradient-to-r from-purple-600 via-indigo-600 to-violet-700 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg shadow-purple-500/20"
               >
                 {saving ? "Saving..." : "Save to Fridge"}
               </button>
@@ -425,7 +440,7 @@ export default function PantryPage() {
         <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-orange-400">
+              <div className="flex items-center gap-2 text-purple-400">
                 <Sparkles size={20} />
                 <h3 className="text-lg font-black text-white">AI Fridge Recipe</h3>
               </div>
@@ -439,15 +454,15 @@ export default function PantryPage() {
               <p className="text-xs text-slate-400 mt-1">{recipe.description}</p>
             </div>
 
-            <div className="flex gap-2 text-xs font-semibold text-orange-300">
-              <span className="bg-orange-950/60 border border-orange-500/30 px-2.5 py-1 rounded-md">
-                ⏱️ Prep: {recipe.prep_time}
+            <div className="flex flex-wrap gap-2 text-xs font-semibold text-purple-300">
+              <span className="bg-purple-950/60 border border-purple-500/30 px-2.5 py-1 rounded-md flex items-center gap-1.5">
+                <Clock size={13} className="text-purple-400" /> Prep: {recipe.prep_time}
               </span>
-              <span className="bg-orange-950/60 border border-orange-500/30 px-2.5 py-1 rounded-md">
-                🍳 Cook: {recipe.cook_time}
+              <span className="bg-purple-950/60 border border-purple-500/30 px-2.5 py-1 rounded-md flex items-center gap-1.5">
+                <ChefHat size={13} className="text-purple-400" /> Cook: {recipe.cook_time}
               </span>
-              <span className="bg-orange-950/60 border border-orange-500/30 px-2.5 py-1 rounded-md">
-                ⭐ {recipe.difficulty}
+              <span className="bg-purple-950/60 border border-purple-500/30 px-2.5 py-1 rounded-md flex items-center gap-1.5">
+                <Star size={13} className="text-purple-400 fill-purple-400/20" /> {recipe.difficulty}
               </span>
             </div>
 
@@ -468,7 +483,7 @@ export default function PantryPage() {
               <div className="space-y-2.5">
                 {recipe.instructions.map((step: RecipeStep) => (
                   <div key={step.step_number} className="flex gap-3 text-xs leading-relaxed">
-                    <span className="w-5 h-5 rounded-full bg-orange-500/20 text-orange-400 font-bold flex items-center justify-center shrink-0">
+                    <span className="w-5 h-5 rounded-full bg-purple-500/20 text-purple-400 font-bold flex items-center justify-center shrink-0">
                       {step.step_number}
                     </span>
                     <span className="text-slate-300">{step.instruction}</span>
@@ -478,8 +493,9 @@ export default function PantryPage() {
             </div>
 
 
-            <div className="bg-emerald-950/30 border border-emerald-800/50 p-3.5 rounded-xl text-xs text-emerald-300 font-medium">
-              🌱 {recipe.waste_saved_summary}
+            <div className="bg-emerald-950/30 border border-emerald-800/50 p-3.5 rounded-xl text-xs text-emerald-300 font-medium flex items-center gap-2">
+              <Leaf size={14} className="shrink-0 text-emerald-400" />
+              <span>{recipe.waste_saved_summary}</span>
             </div>
           </div>
         </div>

@@ -21,6 +21,14 @@ class CleanUrlHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.path = f"{path}.html{query}"
         super().do_GET()
 
+    def end_headers(self):
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "*")
+        self.send_header("Access-Control-Allow-Headers", "*")
+        self.send_header("Permissions-Policy", "camera=*, geolocation=*, microphone=*, clipboard-read=*, clipboard-write=*, display-capture=*")
+        self.send_header("Feature-Policy", "camera *; geolocation *; microphone *; clipboard-read *; clipboard-write *")
+        super().end_headers()
+
 if __name__ == "__main__":
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")

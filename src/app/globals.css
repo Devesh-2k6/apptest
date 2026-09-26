@@ -35,12 +35,29 @@
     --foreground: #0F172A;
   }
 
+  html {
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     background-color: var(--background);
     color: var(--foreground);
     font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  /* Eliminate 300ms mobile touch delay */
+  a, button, input, select, textarea, [role="button"], label {
+    touch-action: manipulation;
+  }
+
+  /* iOS / Mobile momentum scrolling */
+  * {
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -55,7 +72,22 @@
     background-color: rgba(255, 255, 255, 0.95);
     border: 1px solid rgba(124, 58, 237, 0.15);
     box-shadow: 0 10px 30px -10px rgba(124, 58, 237, 0.08);
-    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s ease;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  .transform-gpu {
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
+  .btn-press {
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease;
+  }
+  .btn-press:active {
+    transform: scale(0.97);
   }
 }
 
@@ -131,3 +163,34 @@
   background: transparent !important;
   border: none !important;
 }
+
+/* ─── Ultra-Smooth Purple Custom Scrollbars ──────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.25);
+  border-radius: 9999px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(124, 58, 237, 0.6);
+}
+
+/* ─── Reduced Motion Support ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

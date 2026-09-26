@@ -97,4 +97,17 @@ class ConnectionManager:
         except Exception as e:
             logger.warning(f"Could not dispatch WS broadcast: {e}")
 
+    async def send_personal_message(self, message: dict, user_id: str):
+        """Dispatches a message targeted to a specific user id."""
+        payload = dict(message)
+        payload["target_user_id"] = user_id
+        await self.broadcast(payload)
+
+    def send_personal_message_sync(self, message: dict, user_id: str):
+        """Sync-safe helper to dispatch targeted user message."""
+        payload = dict(message)
+        payload["target_user_id"] = user_id
+        self.broadcast_sync(payload)
+
 manager = ConnectionManager()
+

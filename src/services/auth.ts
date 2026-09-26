@@ -43,6 +43,7 @@ export type CustomerSignupInput = {
 
 export type VendorSignupInput = {
   shop_name: string;
+  category?: string;
   email: string;
   phone_number: string;
   upi_id?: string;
@@ -61,6 +62,7 @@ export type GoogleAuthInput = {
   role?: "CUSTOMER" | "VENDOR" | "ADMIN" | string;
   credential?: string;
   shop_name?: string;
+  category?: string;
   phone_number?: string;
   upi_id?: string;
   address?: string;

@@ -25,6 +25,7 @@ def _serialize_shop(shop: Shop) -> dict:
         "latitude": shop.latitude,
         "longitude": shop.longitude,
         "description": shop.description,
+        "category": getattr(shop, "category", None) or getattr(shop, "location_verification_category", None) or "grocery",
         "owner_id": shop.owner_id,
         "owner_uid": shop.owner_id,
         "average_rating": shop.average_rating,
@@ -206,7 +207,9 @@ def create_shop(
         shop.location_verification_name = matched_name
         shop.location_verification_address = matched_addr
         shop.location_verification_distance_meters = dist_meters
-        shop.location_verification_category = category
+        shop_cat = (getattr(shop_in, "category", None) or category or "grocery").strip().lower()
+        shop.location_verification_category = shop_cat
+        shop.category = shop_cat
         shop.approval_status = "PENDING"
         shop.approved_at = None
         shop.approved_by = None
@@ -214,6 +217,7 @@ def create_shop(
         shop.rejected_at = None
         shop.is_active = False
     else:
+        shop_cat = (getattr(shop_in, "category", None) or category or "grocery").strip().lower()
         shop = Shop(
             owner_id=user.id,
             name=shop_in.name,
@@ -221,6 +225,8 @@ def create_shop(
             latitude=shop_in.latitude,
             longitude=shop_in.longitude,
             description=shop_in.description,
+            category=shop_cat,
+            location_verification_category=shop_cat,
             verification_document_url=shop_in.verification_document_url,
             verification_document_name=shop_in.verification_document_name,
             upi_id=shop_in.upi_id.strip() if shop_in.upi_id else None,
@@ -234,7 +240,6 @@ def create_shop(
             location_verification_name=matched_name,
             location_verification_address=matched_addr,
             location_verification_distance_meters=dist_meters,
-            location_verification_category=category,
             approval_status="PENDING",
             approved_at=None,
             approved_by=None,
@@ -360,6 +365,10 @@ def update_shop(
         shop.delivery_fee = shop_in.delivery_fee
     if shop_in.min_order_amount is not None:
         shop.min_order_amount = shop_in.min_order_amount
+    if getattr(shop_in, "category", None) is not None:
+        clean_cat = shop_in.category.strip().lower() if shop_in.category else "grocery"
+        shop.category = clean_cat
+        shop.location_verification_category = clean_cat
 
     db.commit()
     db.refresh(shop)

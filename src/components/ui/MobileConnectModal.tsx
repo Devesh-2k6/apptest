@@ -166,18 +166,18 @@ export function MobileConnectModal({ isOpen, onClose }: MobileConnectModalProps)
             className="relative w-full max-w-2xl bg-zinc-900/95 border border-zinc-800 rounded-3xl shadow-2xl overflow-hidden z-10 text-white"
           >
             {/* Top Glow Accent */}
-            <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600" />
+            <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-purple-600 via-indigo-500 to-purple-700" />
 
             {/* Header */}
             <div className="p-6 border-b border-zinc-800/80 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                <div className="w-10 h-10 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
                   <Smartphone className="w-5 h-5" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
                     Mobile App & Scanner Hub
-                    <span className="text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                    <span className="text-[10px] font-semibold bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full border border-purple-500/30">
                       LIVE ECOSYSTEM
                     </span>
                   </h2>
@@ -188,7 +188,7 @@ export function MobileConnectModal({ isOpen, onClose }: MobileConnectModalProps)
               </div>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-full bg-zinc-800/80 hover:bg-zinc-700 flex items-center justify-center text-zinc-400 hover:text-white transition"
+                className="w-8 h-8 rounded-full bg-zinc-800/80 hover:bg-zinc-700 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -198,9 +198,9 @@ export function MobileConnectModal({ isOpen, onClose }: MobileConnectModalProps)
             <div className="flex border-b border-zinc-800 px-6 bg-zinc-950/40">
               <button
                 onClick={() => setActiveTab("expogo")}
-                className={`flex items-center gap-2 py-3.5 px-4 text-xs font-semibold border-b-2 transition ${
+                className={`flex items-center gap-2 py-3.5 px-4 text-xs font-semibold border-b-2 transition active:scale-95 cursor-pointer ${
                   activeTab === "expogo"
-                    ? "border-emerald-500 text-emerald-400"
+                    ? "border-purple-500 text-purple-400"
                     : "border-transparent text-zinc-400 hover:text-zinc-200"
                 }`}
               >
@@ -209,9 +209,9 @@ export function MobileConnectModal({ isOpen, onClose }: MobileConnectModalProps)
               </button>
               <button
                 onClick={() => setActiveTab("apk")}
-                className={`flex items-center gap-2 py-3.5 px-4 text-xs font-semibold border-b-2 transition ${
+                className={`flex items-center gap-2 py-3.5 px-4 text-xs font-semibold border-b-2 transition active:scale-95 cursor-pointer ${
                   activeTab === "apk"
-                    ? "border-emerald-500 text-emerald-400"
+                    ? "border-purple-500 text-purple-400"
                     : "border-transparent text-zinc-400 hover:text-zinc-200"
                 }`}
               >
@@ -220,9 +220,9 @@ export function MobileConnectModal({ isOpen, onClose }: MobileConnectModalProps)
               </button>
               <button
                 onClick={() => setActiveTab("sync")}
-                className={`flex items-center gap-2 py-3.5 px-4 text-xs font-semibold border-b-2 transition ${
+                className={`flex items-center gap-2 py-3.5 px-4 text-xs font-semibold border-b-2 transition active:scale-95 cursor-pointer ${
                   activeTab === "sync"
-                    ? "border-emerald-500 text-emerald-400"
+                    ? "border-purple-500 text-purple-400"
                     : "border-transparent text-zinc-400 hover:text-zinc-200"
                 }`}
               >
@@ -477,11 +477,11 @@ export function MobileConnectModal({ isOpen, onClose }: MobileConnectModalProps)
                   </div>
 
                   {/* Sync Trigger Card */}
-                  <div className="p-5 bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-2xl border border-emerald-500/20 shadow-lg space-y-4">
+                  <div className="p-5 bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-2xl border border-purple-500/20 shadow-lg space-y-4">
                     <div className="flex items-start justify-between">
                       <div>
                         <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                          <Sparkles className="w-4 h-4 text-emerald-400" />
+                          <Sparkles className="w-4 h-4 text-purple-400" />
                           Live Ecosystem Health & WebSocket Ping
                         </h4>
                         <p className="text-xs text-zinc-400 mt-1">
@@ -493,7 +493,7 @@ export function MobileConnectModal({ isOpen, onClose }: MobileConnectModalProps)
                     <button
                       onClick={triggerSyncTest}
                       disabled={syncTesting}
-                      className="w-full py-3 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2 transition"
+                      className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer"
                     >
                       {syncTesting ? (
                         <>
@@ -514,12 +514,12 @@ export function MobileConnectModal({ isOpen, onClose }: MobileConnectModalProps)
                         animate={{ opacity: 1, y: 0 }}
                         className={`p-3.5 rounded-xl border text-xs ${
                           syncResult.success
-                            ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+                            ? "bg-purple-500/10 border-purple-500/30 text-purple-300"
                             : "bg-red-500/10 border-red-500/30 text-red-300"
                         }`}
                       >
                         <div className="flex items-center gap-2 font-semibold">
-                          {syncResult.success ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <AlertCircle className="w-4 h-4 text-red-400" />}
+                          {syncResult.success ? <CheckCircle2 className="w-4 h-4 text-purple-400" /> : <AlertCircle className="w-4 h-4 text-red-400" />}
                           {syncResult.productName || "Sync Event"}
                           <span className="text-[10px] text-zinc-400 font-mono ml-auto">{syncResult.timestamp}</span>
                         </div>

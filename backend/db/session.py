@@ -208,6 +208,10 @@ def _auto_migrate_schema() -> None:
                 if "location_verification_category" not in existing_shop_columns:
                     conn.execute(text("ALTER TABLE shops ADD COLUMN location_verification_category VARCHAR(100)"))
 
+                # category
+                if "category" not in existing_shop_columns:
+                    conn.execute(text("ALTER TABLE shops ADD COLUMN category VARCHAR(100) DEFAULT 'grocery'"))
+
                 # approval_status
                 if "approval_status" not in existing_shop_columns:
                     conn.execute(text("ALTER TABLE shops ADD COLUMN approval_status VARCHAR(50) DEFAULT 'PENDING' NOT NULL"))

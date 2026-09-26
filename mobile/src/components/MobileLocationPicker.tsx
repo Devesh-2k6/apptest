@@ -277,7 +277,7 @@ export const MobileLocationPicker: React.FC<MobileLocationPickerProps> = ({
               width: 30px;
               height: 30px;
               border-radius: 50%;
-              background-color: rgba(255, 91, 38, 0.55);
+              background-color: rgba(124, 58, 237, 0.55);
               animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
             }
             .store-pin-body {
@@ -285,13 +285,13 @@ export const MobileLocationPicker: React.FC<MobileLocationPickerProps> = ({
               width: 40px;
               height: 40px;
               border-radius: 50% 50% 50% 0;
-              background: linear-gradient(135deg, #FF5B26 0%, #D83400 100%);
+              background: linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%);
               transform: rotate(-45deg);
               border: 3px solid #ffffff;
               display: flex;
               align-items: center;
               justify-content: center;
-              box-shadow: 0 6px 18px rgba(255,91,38,0.75);
+              box-shadow: 0 6px 18px rgba(124, 58, 237, 0.75);
             }
             .store-pin-emoji {
               transform: rotate(45deg);
@@ -348,8 +348,8 @@ export const MobileLocationPicker: React.FC<MobileLocationPickerProps> = ({
 
             let circle = L.circle([currentLat, currentLng], {
               radius: 60,
-              color: '#FF5B26',
-              fillColor: '#FF5B26',
+              color: '#7C3AED',
+              fillColor: '#7C3AED',
               fillOpacity: 0.15,
               weight: 2,
               dashArray: '4, 6'

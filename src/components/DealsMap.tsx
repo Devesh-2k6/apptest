@@ -208,7 +208,7 @@ export default function DealsMap({
         <div className="bg-white dark:bg-gray-900 border border-emerald-200 dark:border-emerald-800/60 rounded-3xl p-5 shadow-xl space-y-3 animate-in fade-in-50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-orange-100 dark:bg-orange-950/50 text-orange-600 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-950/50 text-purple-600 flex items-center justify-center">
                 <Store size={18} />
               </div>
               <div>

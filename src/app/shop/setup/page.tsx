@@ -22,6 +22,8 @@ import {
   Truck,
   CreditCard,
   QrCode,
+  Building2,
+  Utensils,
 } from "lucide-react";
 import InteractiveMapPicker from "@/components/map/InteractiveMapPicker";
 import { useToast } from "@/components/ui/Toast";
@@ -78,6 +80,8 @@ export default function ShopSetupPage() {
 
   const shopTypes = [
     { id: "grocery", label: "Grocery / Kirana", icon: ShoppingBag },
+    { id: "hotel", label: "Hotel & Hospitality", icon: Building2 },
+    { id: "restaurant", label: "Restaurant & Eatery", icon: Utensils },
     { id: "bakery", label: "Bakery & Sweets", icon: Store },
     { id: "supermarket", label: "Supermarket", icon: Store },
     { id: "cafe", label: "Cafe & Eatery", icon: Store },
@@ -195,6 +199,7 @@ export default function ShopSetupPage() {
         name: shopName.trim(),
         address: address.trim(),
         description: description.trim(),
+        category: shopType,
         latitude,
         longitude,
         upi_id: upiId.trim() || null,

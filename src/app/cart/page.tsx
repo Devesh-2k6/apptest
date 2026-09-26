@@ -115,7 +115,7 @@ export default function CartPage() {
                         {res.product?.name || "Reserved Item"}
                       </h4>
                       <p className="text-xs text-slate-500 dark:text-gray-400 flex items-center gap-1 mt-0.5">
-                        <MapPin size={12} className="text-orange-500" />
+                        <MapPin size={12} className="text-purple-600 dark:text-purple-400" />
                         {(res.product as any)?.shop?.name || (res as any).shop?.name || "Local Shop"}
                       </p>
                       <div className="flex items-center gap-2 mt-2 text-xs">

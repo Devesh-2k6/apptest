@@ -12,6 +12,7 @@ export type ShopUpdatePayload = {
   latitude: number;
   longitude: number;
   description?: string;
+  category?: string | null;
   upi_id?: string | null;
   delivery_enabled?: boolean;
   delivery_fee?: number;

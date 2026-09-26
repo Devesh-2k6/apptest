@@ -46,10 +46,12 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     if (!user) return;
-    getMyNotifications().then(setNotifications).catch(() => {});
-    const interval = setInterval(() => {
+    const fetchNotifs = () => {
+      if (typeof document !== "undefined" && document.hidden) return;
       getMyNotifications().then(setNotifications).catch(() => {});
-    }, 30000);
+    };
+    fetchNotifs();
+    const interval = setInterval(fetchNotifs, 30000);
     return () => clearInterval(interval);
   }, [user]);
 
@@ -86,13 +88,13 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <Loader2 className="animate-spin text-emerald-500" size={32} />
+        <Loader2 className="animate-spin text-purple-600" size={32} />
       </div>
     );
   }
 
   return (
-    <div className="h-screen bg-[#F4FBF7] text-slate-800 flex overflow-hidden">
+    <div className="h-screen bg-[#FAFAFE] text-slate-800 flex overflow-hidden">
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/40 backdrop-blur-sm z-45 lg:hidden"
@@ -101,21 +103,21 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-emerald-100/60 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:flex lg:flex-col ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-purple-100/60 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:flex lg:flex-col ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
-        <div className="h-16 flex items-center px-6 border-b border-emerald-100/40">
+        <div className="h-16 flex items-center px-6 border-b border-purple-100/40">
           <Link href="/" className="flex items-center gap-2" onClick={closeSidebar}>
-            <div className="bg-[#FF5B26] p-1.5 rounded-lg text-white shadow-[0_0_15px_rgba(255,91,38,0.3)]">
+            <div className="bg-[#7C3AED] p-1.5 rounded-lg text-white shadow-[0_0_15px_rgba(124,58,237,0.3)]">
               <Leaf size={20} className="fill-current" />
             </div>
             <span className="text-xl font-black tracking-tight text-slate-900">
-              Mee<span className="text-[#FF5B26]">va</span>
+              Mee<span className="text-[#7C3AED]">va</span>
             </span>
           </Link>
           <button
             type="button"
             onClick={closeSidebar}
-            className="ml-auto lg:hidden text-slate-400 hover:text-slate-900"
+            className="ml-auto lg:hidden text-slate-400 hover:text-slate-900 cursor-pointer"
           >
             <X size={20} />
           </button>
@@ -132,17 +134,17 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
                 key={item.name}
                 href={item.href}
                 onClick={closeSidebar}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold transition-all border ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold transition-all border active:scale-[0.98] ${
                   isActive
-                    ? "bg-emerald-50 text-emerald-700 border-emerald-100 shadow-sm"
-                    : "text-slate-500 hover:text-emerald-700 border-transparent hover:bg-emerald-50/40"
+                    ? "bg-purple-50 text-purple-700 border-purple-100 shadow-sm"
+                    : "text-slate-500 hover:text-purple-700 border-transparent hover:bg-purple-50/40"
                 }`}
               >
                 <item.icon
                   size={20}
                   className={
                     isActive
-                      ? "text-emerald-750"
+                      ? "text-purple-600"
                       : "text-slate-400"
                   }
                 />
@@ -152,11 +154,11 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
           })}
         </div>
 
-        <div className="p-4 border-t border-emerald-100/40">
+        <div className="p-4 border-t border-purple-100/40">
           <button
             type="button"
             onClick={handleLogout}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-red-50 hover:text-red-650 w-full transition-all text-left cursor-pointer"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-red-50 hover:text-red-600 w-full transition-all text-left cursor-pointer active:scale-[0.98]"
           >
             <LogOut size={20} className="text-slate-400" />
             Log out
@@ -165,11 +167,11 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 bg-white/80 backdrop-blur-3xl border-b border-emerald-100/40 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30">
+        <header className="h-16 bg-white/80 backdrop-blur-3xl border-b border-purple-100/40 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30">
           <button
             type="button"
             onClick={() => setIsSidebarOpen(true)}
-            className="lg:hidden p-2 -ml-2 text-slate-400 hover:text-slate-900 rounded-lg hover:bg-emerald-50/50 cursor-pointer"
+            className="lg:hidden p-2 -ml-2 text-slate-400 hover:text-slate-900 rounded-lg hover:bg-purple-50/50 cursor-pointer"
           >
             <Menu size={24} />
           </button>
@@ -179,7 +181,7 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
               <button
                 type="button"
                 onClick={() => setNotifOpen(!notifOpen)}
-                className="p-2 text-slate-500 hover:text-emerald-700 relative bg-emerald-50/40 rounded-xl border border-emerald-100/50 hover:bg-emerald-50 cursor-pointer transition"
+                className="p-2 text-slate-500 hover:text-purple-700 relative bg-purple-50/40 rounded-xl border border-purple-100/50 hover:bg-purple-50 cursor-pointer transition active:scale-95"
                 aria-label="Notifications"
               >
                 <Bell size={18} />
@@ -190,11 +192,11 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
               {notifOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
-                  <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-900 border border-emerald-100 dark:border-gray-700 rounded-2xl shadow-2xl z-50 overflow-hidden">
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-emerald-50 dark:border-gray-800">
+                  <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-900 border border-purple-100 dark:border-gray-700 rounded-2xl shadow-2xl z-50 overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-purple-50 dark:border-gray-800">
                       <p className="text-sm font-black text-slate-800 dark:text-white">Notifications</p>
                       {unreadCount > 0 && (
-                        <button onClick={handleMarkAllRead} className="text-xs text-emerald-600 font-bold hover:text-emerald-800 transition flex items-center gap-1">
+                        <button onClick={handleMarkAllRead} className="text-xs text-purple-600 font-bold hover:text-purple-800 transition flex items-center gap-1 cursor-pointer">
                           <CheckCircle2 size={12} /> Mark all read
                         </button>
                       )}
@@ -203,14 +205,14 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
                       {notifications.length === 0 ? (
                         <p className="text-sm text-slate-400 text-center py-8">No notifications yet.</p>
                       ) : notifications.slice(0, 10).map((n) => (
-                        <div key={n.id} className={`px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition ${!n.is_read ? "bg-emerald-50/40 dark:bg-emerald-500/5" : ""}`}>
+                        <div key={n.id} className={`px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition ${!n.is_read ? "bg-purple-50/40 dark:bg-purple-500/5" : ""}`}>
                           <p className={`text-xs font-bold ${!n.is_read ? "text-slate-900 dark:text-white" : "text-slate-600 dark:text-slate-400"}`}>{n.title}</p>
                           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">{n.message}</p>
                         </div>
                       ))}
                     </div>
                     <div className="border-t border-gray-100 dark:border-gray-800 px-4 py-2.5">
-                      <Link href="/notifications" onClick={() => setNotifOpen(false)} className="text-xs text-emerald-600 font-bold hover:text-emerald-800 transition">View all notifications →</Link>
+                      <Link href="/notifications" onClick={() => setNotifOpen(false)} className="text-xs text-purple-600 font-bold hover:text-purple-800 transition">View all notifications →</Link>
                     </div>
                   </div>
                 </>
@@ -220,7 +222,7 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
               <button
                 type="button"
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="h-8 w-8 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 flex items-center justify-center text-emerald-750 font-black text-sm border border-emerald-500/20 cursor-pointer transition shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+                className="h-8 w-8 rounded-full bg-purple-500/10 hover:bg-purple-500/20 flex items-center justify-center text-purple-700 font-black text-sm border border-purple-500/20 cursor-pointer transition shadow-[0_0_10px_rgba(124,58,237,0.15)] active:scale-95"
               >
                 {initial}
               </button>
@@ -228,8 +230,8 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
               {isProfileOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setIsProfileOpen(false)} />
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-2xl border border-emerald-100 z-50 overflow-hidden">
-                    <div className="px-4 py-3 border-b border-emerald-100/40 bg-emerald-50/20">
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-2xl border border-purple-100 z-50 overflow-hidden">
+                    <div className="px-4 py-3 border-b border-purple-100/40 bg-purple-50/20">
                       <p className="text-sm text-slate-800 font-bold truncate">
                         {displayName}
                       </p>
@@ -239,7 +241,7 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
                       <Link
                         href="/shop/settings"
                         onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/40"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:text-purple-700 hover:bg-purple-50/40"
                       >
                         <Settings size={16} />
                         Settings
@@ -250,7 +252,7 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
                           setIsProfileOpen(false);
                           handleLogout();
                         }}
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:text-red-650 hover:bg-red-50 w-full text-left transition-colors cursor-pointer"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:text-red-600 hover:bg-red-50 w-full text-left transition-colors cursor-pointer"
                       >
                         <LogOut size={16} />
                         Log out

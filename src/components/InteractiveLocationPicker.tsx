@@ -26,10 +26,10 @@ function createStorePin() {
     html: `
       <div style="position: relative; width: 46px; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; transform: translate(-23px, -52px); cursor: grab; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.5));">
         <!-- Pulsing Base Ring -->
-        <span style="position: absolute; bottom: 0px; width: 32px; height: 32px; border-radius: 50%; background-color: rgba(255, 91, 38, 0.55); animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></span>
+        <span style="position: absolute; bottom: 0px; width: 32px; height: 32px; border-radius: 50%; background-color: rgba(124, 58, 237, 0.55); animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></span>
         
         <!-- Pin Body -->
-        <div style="position: relative; width: 44px; height: 44px; border-radius: 50% 50% 50% 0; background: linear-gradient(135deg, #FF5B26 0%, #D83400 100%); transform: rotate(-45deg); border: 3.5px solid #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(255,91,38,0.8);">
+        <div style="position: relative; width: 44px; height: 44px; border-radius: 50% 50% 50% 0; background: linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%); transform: rotate(-45deg); border: 3.5px solid #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(124,58,237,0.8);">
           <span style="transform: rotate(45deg); font-size: 20px; line-height: 1; user-select: none;">🏪</span>
         </div>
       </div>
@@ -397,7 +397,7 @@ export default function InteractiveLocationPicker({
             type="button"
             onClick={() => void handleDetectLiveLocation()}
             disabled={isGeolocating}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-orange-600 hover:bg-orange-500 active:scale-95 text-white text-xs font-black transition shadow-sm cursor-pointer disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-95 text-white text-xs font-black transition shadow-sm cursor-pointer disabled:opacity-50"
           >
             {isGeolocating ? <Loader2 size={13} className="animate-spin" /> : <Locate size={13} />}
             {isGeolocating ? "Locating..." : "📍 Locate Me (GPS)"}
@@ -407,7 +407,7 @@ export default function InteractiveLocationPicker({
 
       {/* Manual Coordinate Fine-Tuning Box */}
       {showManualCoords && (
-        <form onSubmit={handleApplyManualCoords} className="p-3 bg-orange-50/60 dark:bg-gray-850 rounded-2xl border border-orange-200 dark:border-gray-700 flex flex-wrap items-center gap-2 text-xs animate-in fade-in-50">
+        <form onSubmit={handleApplyManualCoords} className="p-3 bg-purple-50/60 dark:bg-gray-850 rounded-2xl border border-purple-200 dark:border-gray-700 flex flex-wrap items-center gap-2 text-xs animate-in fade-in-50">
           <div className="flex-1 min-w-[120px]">
             <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-gray-400 mb-0.5">Latitude</label>
             <input
@@ -430,7 +430,7 @@ export default function InteractiveLocationPicker({
           </div>
           <button
             type="submit"
-            className="self-end px-4 py-1.5 bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs rounded-lg transition cursor-pointer"
+            className="self-end px-4 py-1.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-lg transition cursor-pointer"
           >
             Apply Pin
           </button>
@@ -452,7 +452,7 @@ export default function InteractiveLocationPicker({
                 }
               }}
               placeholder="Type your area, street, landmark, pincode, or Google Maps link..."
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-slate-900 dark:text-white text-xs font-medium outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition"
+              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-slate-900 dark:text-white text-xs font-medium outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition"
             />
             <Search size={15} className="absolute left-3 top-3 text-slate-400" />
           </div>
@@ -460,7 +460,7 @@ export default function InteractiveLocationPicker({
             type="button"
             onClick={() => void handleSearchAddress(searchQuery)}
             disabled={isSearching || !searchQuery.trim()}
-            className="px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 active:scale-95 text-white text-xs font-bold transition flex items-center gap-1.5 disabled:opacity-40 cursor-pointer shadow-sm shrink-0"
+            className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-95 text-white text-xs font-bold transition flex items-center gap-1.5 disabled:opacity-40 cursor-pointer shadow-sm shrink-0"
           >
             {isSearching ? <Loader2 size={14} className="animate-spin" /> : <Compass size={14} />}
             Search & Pin
@@ -487,9 +487,9 @@ export default function InteractiveLocationPicker({
                   setSearchResults([]);
                   onLocationChange({ lat: targetLat, lng: targetLng, address: res.display_name });
                 }}
-                className="w-full text-left p-2.5 rounded-xl hover:bg-orange-50 dark:hover:bg-gray-800 text-xs font-semibold text-slate-800 dark:text-gray-200 transition cursor-pointer flex items-center gap-2"
+                className="w-full text-left p-2.5 rounded-xl hover:bg-purple-50 dark:hover:bg-gray-800 text-xs font-semibold text-slate-800 dark:text-gray-200 transition cursor-pointer flex items-center gap-2"
               >
-                <MapPin size={14} className="text-orange-500 shrink-0" />
+                <MapPin size={14} className="text-purple-600 shrink-0" />
                 <span className="truncate">{res.display_name}</span>
               </button>
             ))}
@@ -509,7 +509,7 @@ export default function InteractiveLocationPicker({
               setLng(city.lng);
               handlePositionChange(city.lat, city.lng);
             }}
-            className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-gray-800 hover:bg-orange-100 dark:hover:bg-gray-700 text-slate-700 dark:text-gray-300 font-semibold transition shrink-0 cursor-pointer"
+            className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-gray-800 hover:bg-purple-100 dark:hover:bg-gray-700 text-slate-700 dark:text-gray-300 font-semibold transition shrink-0 cursor-pointer"
           >
             📍 {city.name}
           </button>
@@ -532,7 +532,7 @@ export default function InteractiveLocationPicker({
       )}
 
       {/* High-Definition 100% Free Leaflet & OpenStreetMap / Satellite Canvas */}
-      <div className="relative w-full h-80 sm:h-96 rounded-3xl overflow-hidden border-2 border-orange-300 dark:border-gray-700 shadow-xl group">
+      <div className="relative w-full h-80 sm:h-96 rounded-3xl overflow-hidden border-2 border-purple-200 dark:border-gray-700 shadow-xl group">
         <MapContainer
           center={[lat, lng]}
           zoom={18}
@@ -563,8 +563,8 @@ export default function InteractiveLocationPicker({
             center={[lat, lng]}
             radius={60}
             pathOptions={{
-              color: "#FF5B26",
-              fillColor: "#FF5B26",
+              color: "#7C3AED",
+              fillColor: "#7C3AED",
               fillOpacity: 0.15,
               weight: 2,
               dashArray: "4 6",
@@ -589,7 +589,7 @@ export default function InteractiveLocationPicker({
           >
             <Popup className="custom-store-popup">
               <div className="p-1 text-center font-sans">
-                <div className="text-xs font-black text-orange-600 mb-0.5">🏪 Storefront Pin</div>
+                <div className="text-xs font-black text-purple-600 mb-0.5">🏪 Storefront Pin</div>
                 <div className="text-[11px] text-slate-600 leading-snug">{address || "Selected Storefront Location"}</div>
                 <div className="text-[10px] text-slate-400 mt-1 font-mono">{lat.toFixed(6)}, {lng.toFixed(6)}</div>
               </div>
@@ -615,7 +615,7 @@ export default function InteractiveLocationPicker({
             type="button"
             onClick={() => handleNudge("north")}
             title="Nudge North 10m"
-            className="w-7 h-7 bg-slate-100 hover:bg-orange-500 hover:text-white dark:bg-gray-800 rounded-lg flex items-center justify-center text-slate-700 dark:text-gray-200 transition cursor-pointer"
+            className="w-7 h-7 bg-slate-100 hover:bg-purple-600 hover:text-white dark:bg-gray-800 rounded-lg flex items-center justify-center text-slate-700 dark:text-gray-200 transition cursor-pointer"
           >
             <ChevronUp size={16} />
           </button>
@@ -624,18 +624,18 @@ export default function InteractiveLocationPicker({
               type="button"
               onClick={() => handleNudge("west")}
               title="Nudge West 10m"
-              className="w-7 h-7 bg-slate-100 hover:bg-orange-500 hover:text-white dark:bg-gray-800 rounded-lg flex items-center justify-center text-slate-700 dark:text-gray-200 transition cursor-pointer"
+              className="w-7 h-7 bg-slate-100 hover:bg-purple-600 hover:text-white dark:bg-gray-800 rounded-lg flex items-center justify-center text-slate-700 dark:text-gray-200 transition cursor-pointer"
             >
               <ChevronLeft size={16} />
             </button>
-            <div className="w-5 h-5 rounded-full bg-orange-500 text-white flex items-center justify-center text-[10px] font-black">
+            <div className="w-5 h-5 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px] font-black">
               🎯
             </div>
             <button
               type="button"
               onClick={() => handleNudge("east")}
               title="Nudge East 10m"
-              className="w-7 h-7 bg-slate-100 hover:bg-orange-500 hover:text-white dark:bg-gray-800 rounded-lg flex items-center justify-center text-slate-700 dark:text-gray-200 transition cursor-pointer"
+              className="w-7 h-7 bg-slate-100 hover:bg-purple-600 hover:text-white dark:bg-gray-800 rounded-lg flex items-center justify-center text-slate-700 dark:text-gray-200 transition cursor-pointer"
             >
               <ChevronRight size={16} />
             </button>
@@ -644,7 +644,7 @@ export default function InteractiveLocationPicker({
             type="button"
             onClick={() => handleNudge("south")}
             title="Nudge South 10m"
-            className="w-7 h-7 bg-slate-100 hover:bg-orange-500 hover:text-white dark:bg-gray-800 rounded-lg flex items-center justify-center text-slate-700 dark:text-gray-200 transition cursor-pointer"
+            className="w-7 h-7 bg-slate-100 hover:bg-purple-600 hover:text-white dark:bg-gray-800 rounded-lg flex items-center justify-center text-slate-700 dark:text-gray-200 transition cursor-pointer"
           >
             <ChevronDown size={16} />
           </button>
@@ -664,7 +664,7 @@ export default function InteractiveLocationPicker({
           </label>
           <div className="flex items-center gap-2">
             {isReverseGeocoding && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-orange-600">
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-600">
                 <Loader2 size={11} className="animate-spin" /> Fetching street...
               </span>
             )}
@@ -672,7 +672,7 @@ export default function InteractiveLocationPicker({
               <button
                 type="button"
                 onClick={() => void handleSearchAddress(address)}
-                className="text-[11px] font-bold text-orange-600 hover:text-orange-700 flex items-center gap-1 cursor-pointer"
+                className="text-[11px] font-bold text-purple-600 hover:text-purple-700 flex items-center gap-1 cursor-pointer"
               >
                 <Compass size={12} /> Pin Written Address on Map
               </button>
@@ -688,7 +688,7 @@ export default function InteractiveLocationPicker({
             onLocationChange({ lat, lng, address: e.target.value });
           }}
           placeholder="Click anywhere on the map or type your address here, then click 'Pin Written Address'..."
-          className="w-full rounded-xl border border-slate-200 dark:border-gray-700 bg-slate-50/80 dark:bg-gray-900/80 text-slate-900 dark:text-white px-3.5 py-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 resize-none transition"
+          className="w-full rounded-xl border border-slate-200 dark:border-gray-700 bg-slate-50/80 dark:bg-gray-900/80 text-slate-900 dark:text-white px-3.5 py-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 resize-none transition"
         />
       </div>
     </div>

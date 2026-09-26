@@ -13,7 +13,7 @@ import { MobileAppFloatingButton } from "@/components/ui/MobileAppFloatingButton
 import { ToastProvider } from "@/components/ui/Toast";
 import { RouteProgressBar } from "@/components/ui/RouteProgressBar";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
   title: "Meeva | Surplus Food & Grocery Rescue",
@@ -36,6 +36,8 @@ export default function RootLayout({
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#7C3AED" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
+        <meta httpEquiv="Permissions-Policy" content="camera=*, geolocation=*, microphone=*, clipboard-read=*, clipboard-write=*, display-capture=*" />
         {/* Google Identity Services for 1-Click Google Sign In (Same as App Emergent) */}
         <script src="https://accounts.google.com/gsi/client" async defer></script>
       </head>

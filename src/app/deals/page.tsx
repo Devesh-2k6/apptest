@@ -100,8 +100,17 @@ export default function CustomerDealsPage() {
   } | null>(null);
 
   useEffect(() => {
-    const handleScroll = () => setShowGoTop(window.scrollY > 400);
-    window.addEventListener("scroll", handleScroll);
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setShowGoTop(window.scrollY > 400);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -126,6 +135,7 @@ export default function CustomerDealsPage() {
     });
   };
 
+  const [marketMode, setMarketMode] = useState<"GROCERY" | "HOTEL">("GROCERY");
   const [activeFilter, setActiveFilter] = useState("All");
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [lat, setLat] = useState<number | undefined>();
@@ -598,7 +608,7 @@ export default function CustomerDealsPage() {
   const isAiRecommended = activeFilter === "AI Recommended ✨";
   const isSavedFilter = activeFilter === "Saved ❤️";
   const isRecipeResult = isDeepSearchActive && deepSearchData?.recipe_mode === true;
-  const displayProducts = isAiRecommended
+  const rawProducts = isAiRecommended
     ? recommendedProducts
     : isSavedFilter
     ? (isDeepSearchActive && deepSearchData
@@ -607,6 +617,26 @@ export default function CustomerDealsPage() {
     : isDeepSearchActive && deepSearchData
     ? (deepSearchData.recipe_mode ? deepSearchData.matched_deals : deepSearchData.products)
     : standardProducts;
+
+  const displayProducts = rawProducts.filter((product) => {
+    if (marketMode === "HOTEL") {
+      // Hotel & Restaurant Mode
+      if (activeFilter === "All") {
+        return (
+          product.category === "PREPARED_FOOD" ||
+          product.is_surprise_bag ||
+          (product.shop?.name && /restaurant|hotel|cafe|kitchen|dhaba|bhojanalaya|biryani|bakery/i.test(product.shop.name))
+        );
+      }
+      return product.category === activeFilter;
+    } else {
+      // Instamart & Grocery Mode
+      if (activeFilter === "All") {
+        return product.category !== "PREPARED_FOOD" && !product.is_surprise_bag;
+      }
+      return product.category === activeFilter;
+    }
+  });
 
   let displayStatus = "success";
   let errorMessage: string | null = null;
@@ -738,19 +768,72 @@ export default function CustomerDealsPage() {
               </Link>
             </div>
 
+            {/* ── Swiggy-Style Dual Marketplace Mode Switcher ── */}
+            <div className="grid grid-cols-2 p-1 bg-zinc-100 dark:bg-zinc-900/90 rounded-2xl border border-zinc-200/80 dark:border-zinc-800">
+              <button
+                type="button"
+                onClick={() => {
+                  setMarketMode("GROCERY");
+                  setActiveFilter("All");
+                }}
+                className={`flex items-center justify-center gap-2.5 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  marketMode === "GROCERY"
+                    ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-zinc-200/60 dark:border-zinc-700"
+                    : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+                }`}
+              >
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${marketMode === "GROCERY" ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-zinc-200/60 dark:bg-zinc-800 text-zinc-400"}`}>
+                  <ShoppingBag size={15} />
+                </div>
+                <div className="text-left min-w-0">
+                  <span className="block leading-tight font-black text-xs truncate">Meeva Instamart</span>
+                  <span className="text-[10px] opacity-70 block font-medium truncate">Kirana & Groceries</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setMarketMode("HOTEL");
+                  setActiveFilter("All");
+                }}
+                className={`flex items-center justify-center gap-2.5 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  marketMode === "HOTEL"
+                    ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-zinc-200/60 dark:border-zinc-700"
+                    : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+                }`}
+              >
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${marketMode === "HOTEL" ? "bg-purple-500/10 text-purple-600 dark:text-purple-400" : "bg-zinc-200/60 dark:bg-zinc-800 text-zinc-400"}`}>
+                  <Utensils size={15} />
+                </div>
+                <div className="text-left min-w-0">
+                  <span className="block leading-tight font-black text-xs truncate">Meeva Food</span>
+                  <span className="text-[10px] opacity-70 block font-medium truncate">Hotels & Restaurants</span>
+                </div>
+              </button>
+            </div>
+
             {/* Segmented Category Filter Chips */}
-            <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 scrollbar-hide pt-1">
-              {[
-                { id: "All", label: "All Deals", icon: Layers, color: "text-emerald-500" },
-                { id: "AI Recommended ✨", label: "AI Picks", icon: Sparkles, color: "text-purple-500" },
-                { id: "BAKERY", label: "Bakery", icon: Croissant, color: "text-amber-500" },
-                { id: "DAIRY", label: "Dairy", icon: Milk, color: "text-blue-500" },
-                { id: "PRODUCE", label: "Produce", icon: Apple, color: "text-emerald-500" },
-                { id: "MEAT", label: "Meat & Poultry", icon: Beef, color: "text-rose-500" },
-                { id: "PANTRY", label: "Pantry Staples", icon: Wheat, color: "text-amber-600" },
-                { id: "PREPARED_FOOD", label: "Ready Food", icon: Utensils, color: "text-orange-500" },
-                { id: "Saved ❤️", label: "Saved", icon: Bookmark, color: "text-rose-500" },
-              ].map((cat) => {
+            <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 scrollbar-hide pt-0.5">
+              {(marketMode === "GROCERY"
+                ? [
+                    { id: "All", label: "All Groceries", icon: Layers, color: "text-emerald-500" },
+                    { id: "AI Recommended ✨", label: "AI Picks", icon: Sparkles, color: "text-purple-500" },
+                    { id: "DAIRY", label: "Dairy & Milk", icon: Milk, color: "text-blue-500" },
+                    { id: "BAKERY", label: "Bakery & Bread", icon: Croissant, color: "text-amber-500" },
+                    { id: "PRODUCE", label: "Fresh Veg & Fruit", icon: Apple, color: "text-emerald-500" },
+                    { id: "PANTRY", label: "Pantry Staples", icon: Wheat, color: "text-amber-600" },
+                    { id: "MEAT", label: "Meat & Eggs", icon: Beef, color: "text-rose-500" },
+                    { id: "Saved ❤️", label: "Saved", icon: Bookmark, color: "text-rose-500" },
+                  ]
+                : [
+                    { id: "All", label: "All Restaurant Deals", icon: Layers, color: "text-purple-500" },
+                    { id: "PREPARED_FOOD", label: "Hot Meals & Thalis", icon: Utensils, color: "text-purple-500" },
+                    { id: "BAKERY", label: "Cafe & Pastries", icon: Croissant, color: "text-amber-500" },
+                    { id: "AI Recommended ✨", label: "Chef Picks", icon: Sparkles, color: "text-purple-500" },
+                    { id: "Saved ❤️", label: "Saved", icon: Bookmark, color: "text-rose-500" },
+                  ]
+              ).map((cat) => {
                 const active = activeFilter === cat.id;
                 const Icon = cat.icon;
                 return (
@@ -763,7 +846,7 @@ export default function CustomerDealsPage() {
                         : "bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700"
                     }`}
                   >
-                    <Icon size={13} className={active ? "text-emerald-400 dark:text-emerald-600" : cat.color} />
+                    <Icon size={13} className={active ? (marketMode === "HOTEL" ? "text-purple-400 dark:text-purple-500" : "text-emerald-400 dark:text-emerald-600") : cat.color} />
                     <span>{cat.label}</span>
                   </button>
                 );
@@ -1065,9 +1148,13 @@ export default function CustomerDealsPage() {
             
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-3 max-w-xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Featured Surplus Rescue
+                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                  marketMode === "HOTEL"
+                    ? "bg-purple-500/20 text-purple-300 border-purple-500/30"
+                    : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${marketMode === "HOTEL" ? "bg-purple-400" : "bg-emerald-400"}`} />
+                  {marketMode === "HOTEL" ? "Featured Restaurant Meal Rescue" : "Featured Grocery Rescue"}
                 </div>
                 
                 <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight capitalize">
@@ -1075,7 +1162,15 @@ export default function CustomerDealsPage() {
                 </h2>
                 
                 <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-normal">
-                  Rescuing from <span className="font-semibold text-white">{displayProducts[0].shop?.name || "Verified Store"}</span>. Save up to {Math.max(5, Math.min(95, Math.round((1 - (displayProducts[0].current_price || displayProducts[0].discount_price) / (displayProducts[0].original_price || 1)) * 100)))}% off retail pricing before clearance expiry.
+                  {marketMode === "HOTEL" ? (
+                    <>
+                      Freshly prepared at <span className="font-semibold text-white">{displayProducts[0].shop?.name || "Verified Restaurant"}</span>. Pick up tonight before closing and save up to {Math.max(5, Math.min(95, Math.round((1 - (displayProducts[0].current_price || displayProducts[0].discount_price) / (displayProducts[0].original_price || 1)) * 100)))}% off dine-in menu pricing!
+                    </>
+                  ) : (
+                    <>
+                      Rescuing from <span className="font-semibold text-white">{displayProducts[0].shop?.name || "Verified Store"}</span>. Save up to {Math.max(5, Math.min(95, Math.round((1 - (displayProducts[0].current_price || displayProducts[0].discount_price) / (displayProducts[0].original_price || 1)) * 100)))}% off retail pricing before clearance expiry.
+                    </>
+                  )}
                 </p>
 
                 <div className="flex items-center gap-3 pt-1">
@@ -1309,7 +1404,7 @@ export default function CustomerDealsPage() {
                   <button
                     type="button"
                     onClick={() => setIgnoreDistance(true)}
-                    className="inline-flex items-center gap-2 bg-[#FF5B26] hover:bg-[#E54B18] text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-md shadow-orange-500/20 cursor-pointer"
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-md shadow-purple-500/25 cursor-pointer"
                   >
                     <span>🌐 Search All Deals (Ignore Distance)</span>
                   </button>
@@ -1327,10 +1422,12 @@ export default function CustomerDealsPage() {
               <>
                 <Package size={48} className="mx-auto text-gray-300 dark:text-gray-600 mb-3" />
                 <p className="font-bold text-gray-900 dark:text-white text-base">
-                  No active deals found
+                  {marketMode === "HOTEL" ? "No active restaurant surplus meals right now" : "No active grocery deals found"}
                 </p>
                 <p className="text-sm mt-1 max-w-sm mx-auto text-gray-500 dark:text-gray-400 leading-relaxed">
-                  All past deals have been rescued or expired. Verified shops can add new deals from their merchant dashboard.
+                  {marketMode === "HOTEL" 
+                    ? "Local restaurants, buffets, and cafes drop their lunch surplus (3:30–4:30 PM) and dinner surplus (9:00–10:30 PM). Check back during closing hours!" 
+                    : "All past grocery deals have been rescued or expired. Verified shops can add new deals from their merchant dashboard."}
                 </p>
                 <div className="flex flex-wrap justify-center gap-3 mt-5">
                   {ignoreDistance && lat && (
@@ -1389,7 +1486,7 @@ export default function CustomerDealsPage() {
             {/* Modal Header */}
             <div className="p-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gray-50/50 dark:bg-gray-850/50">
               <div className="flex items-center gap-2.5">
-                <div className={`w-9 h-9 rounded-2xl flex items-center justify-center ${modalStep === "upi_payment" ? "bg-purple-500/10 text-purple-600 dark:text-purple-400" : orderType === "DELIVERY" ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-orange-500/10 text-[#FF5B26]"}`}>
+                <div className={`w-9 h-9 rounded-2xl flex items-center justify-center ${modalStep === "upi_payment" ? "bg-purple-500/10 text-purple-600 dark:text-purple-400" : orderType === "DELIVERY" ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-purple-500/10 text-purple-600 dark:text-purple-400"}`}>
                   {modalStep === "upi_payment" ? <Smartphone size={20} /> : orderType === "DELIVERY" ? <Truck size={20} /> : <ShoppingBag size={20} />}
                 </div>
                 <div>
@@ -1519,15 +1616,15 @@ export default function CustomerDealsPage() {
                       onClick={() => setOrderType("PICKUP")}
                       className={`p-3.5 rounded-2xl border text-left transition-all flex flex-col justify-between relative cursor-pointer ${
                         orderType === "PICKUP"
-                          ? "bg-orange-50/80 dark:bg-orange-950/30 border-[#FF5B26] ring-2 ring-orange-500/20 shadow-sm"
-                          : "bg-white dark:bg-gray-800/60 border-gray-200 dark:border-gray-700 hover:border-orange-300 opacity-75 hover:opacity-100"
+                          ? "bg-purple-50/80 dark:bg-purple-950/30 border-purple-600 ring-2 ring-purple-500/20 shadow-sm"
+                          : "bg-white dark:bg-gray-800/60 border-gray-200 dark:border-gray-700 hover:border-purple-300 opacity-75 hover:opacity-100"
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <div className={`w-7 h-7 rounded-xl flex items-center justify-center ${orderType === "PICKUP" ? "bg-[#FF5B26] text-white" : "bg-gray-100 dark:bg-gray-700 text-gray-500"}`}>
+                        <div className={`w-7 h-7 rounded-xl flex items-center justify-center ${orderType === "PICKUP" ? "bg-purple-600 text-white" : "bg-gray-100 dark:bg-gray-700 text-gray-500"}`}>
                           <ShoppingBag size={15} />
                         </div>
-                        <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${orderType === "PICKUP" ? "bg-[#FF5B26] text-white" : "bg-gray-100 dark:bg-gray-700 text-gray-500"}`}>
+                        <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${orderType === "PICKUP" ? "bg-purple-600 text-white" : "bg-gray-100 dark:bg-gray-700 text-gray-500"}`}>
                           ₹0 Free
                         </span>
                       </div>
@@ -1652,9 +1749,9 @@ export default function CustomerDealsPage() {
                   </div>
                 ) : (
                   /* Store Pickup Instructions */
-                  <div className="p-4 bg-orange-50/80 dark:bg-orange-950/20 border border-orange-200/80 dark:border-orange-800/40 rounded-2xl space-y-2 text-xs text-orange-900 dark:text-orange-200 animate-in fade-in duration-200">
+                  <div className="p-4 bg-purple-50/80 dark:bg-purple-950/20 border border-purple-200/80 dark:border-purple-800/40 rounded-2xl space-y-2 text-xs text-purple-900 dark:text-purple-200 animate-in fade-in duration-200">
                     <div className="flex items-center gap-2">
-                      <QrCode size={18} className="text-[#FF5B26] shrink-0" />
+                      <QrCode size={18} className="text-purple-600 shrink-0" />
                       <strong className="font-black text-slate-900 dark:text-white uppercase tracking-wider text-[11px]">
                         Instant Counter QR Pass &amp; 6-Digit PIN
                       </strong>
@@ -1662,7 +1759,7 @@ export default function CustomerDealsPage() {
                     <p className="text-[11px] leading-relaxed text-slate-600 dark:text-gray-300">
                       Reserving locks in your surplus discount immediately. You will receive a <strong>Scannable Store QR Pass &amp; 6-Digit PIN</strong> to show the merchant upon in-store collection.
                     </p>
-                    <div className="pt-1 text-[11px] font-bold text-[#FF5B26] flex items-start gap-1">
+                    <div className="pt-1 text-[11px] font-bold text-purple-600 dark:text-purple-400 flex items-start gap-1">
                       <MapPin size={13} className="shrink-0 mt-0.5" />
                       <span>{selectedProductForOrder.shop?.name} &bull; {selectedProductForOrder.shop?.address}</span>
                     </div>
@@ -1722,7 +1819,7 @@ export default function CustomerDealsPage() {
                     className={`flex-[2] py-3.5 rounded-2xl text-white font-black text-xs transition flex items-center justify-center gap-2 shadow-lg cursor-pointer disabled:opacity-50 ${
                       orderType === "DELIVERY"
                         ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/30"
-                        : "bg-[#FF5B26] hover:bg-[#E54B18] shadow-orange-500/30"
+                        : "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-purple-500/30"
                     }`}
                   >
                     {isPlacingOrder ? (
@@ -1950,7 +2047,7 @@ export default function CustomerDealsPage() {
                     <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
                       6-Digit Pickup PIN
                     </span>
-                    <div className="font-mono text-2xl font-black tracking-[0.35em] text-orange-400 bg-slate-800/90 py-2.5 px-5 rounded-xl border border-slate-700/60 inline-block shadow-inner">
+                    <div className="font-mono text-2xl font-black tracking-[0.35em] text-purple-400 bg-slate-800/90 py-2.5 px-5 rounded-xl border border-slate-700/60 inline-block shadow-inner">
                       {(orderSuccessDetails.pickupCode || "000000").split("").join(" ")}
                     </div>
                   </div>
@@ -1958,10 +2055,10 @@ export default function CustomerDealsPage() {
                   <div className="text-left text-xs bg-slate-800/50 p-3.5 rounded-2xl border border-slate-700/40 space-y-1.5">
                     <div className="flex justify-between items-center text-slate-200 font-bold">
                       <span className="truncate max-w-[210px]">{orderSuccessDetails.name}</span>
-                      <span className="text-orange-400 font-black text-sm">₹{orderSuccessDetails.price.toFixed(2)}</span>
+                      <span className="text-purple-400 font-black text-sm">₹{orderSuccessDetails.price.toFixed(2)}</span>
                     </div>
                     <div className="text-[11px] text-slate-400 flex items-center gap-1">
-                      <MapPin size={12} className="text-orange-400 shrink-0" />
+                      <MapPin size={12} className="text-purple-400 shrink-0" />
                       <span className="truncate">{orderSuccessDetails.shopName} {orderSuccessDetails.shopAddress ? `• ${orderSuccessDetails.shopAddress}` : ""}</span>
                     </div>
                   </div>

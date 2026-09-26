@@ -245,7 +245,7 @@ function VerifyEmailContent() {
               ) : (
                 <Link
                   href="/deals"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#FF5B26] hover:bg-[#E54B18] active:scale-95 text-white font-black px-6 py-3.5 rounded-2xl transition shadow-lg shadow-orange-500/25 cursor-pointer"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 via-indigo-600 to-violet-700 hover:from-purple-500 hover:to-indigo-500 active:scale-95 text-white font-black px-6 py-3.5 rounded-2xl transition shadow-lg shadow-purple-500/25 cursor-pointer"
                 >
                   <ShoppingBag size={18} />
                   Explore Live Deals
@@ -336,7 +336,7 @@ function VerifyEmailContent() {
             <div className="pt-2 flex justify-center">
               <Link
                 href="/deals"
-                className="inline-flex items-center gap-2 bg-[#FF5B26] hover:bg-[#E54B18] text-white font-black px-6 py-3.5 rounded-2xl transition shadow-lg shadow-orange-500/25 cursor-pointer"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 via-indigo-600 to-violet-700 hover:from-purple-500 hover:to-indigo-500 text-white font-black px-6 py-3.5 rounded-2xl transition shadow-lg shadow-purple-500/25 cursor-pointer"
               >
                 Go to Deals Feed <ArrowRight size={18} />
               </Link>

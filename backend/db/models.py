@@ -88,6 +88,7 @@ class Shop(Base):
     latitude: Mapped[float] = mapped_column(Float, index=True, nullable=False)
     longitude: Mapped[float] = mapped_column(Float, index=True, nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    category: Mapped[str | None] = mapped_column(String(100), default="grocery", nullable=True)
     
     # Storefront Photo & Verification Documents
     photo_url: Mapped[str | None] = mapped_column(Text, nullable=True)

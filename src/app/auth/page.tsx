@@ -49,7 +49,7 @@ const InteractiveLocationPicker = dynamic(() => import("@/components/Interactive
   loading: () => (
     <div className="w-full h-64 rounded-2xl bg-slate-100 dark:bg-gray-800 flex items-center justify-center border border-slate-200 dark:border-gray-700 animate-pulse">
       <div className="flex flex-col items-center gap-2">
-        <MapPin size={24} className="text-orange-500 animate-bounce" />
+        <MapPin size={24} className="text-purple-600 animate-bounce" />
         <span className="text-xs font-bold text-slate-500">Loading High-Definition Live Map...</span>
       </div>
     </div>
@@ -134,6 +134,7 @@ export default function AuthPage() {
 
   // Vendor Signup fields
   const [vendorShopName, setVendorShopName] = useState("");
+  const [vendorCategory, setVendorCategory] = useState("grocery");
   const [vendorEmail, setVendorEmail] = useState("");
   const [vendorPhone, setVendorPhone] = useState("");
   const [vendorUpiId, setVendorUpiId] = useState("");
@@ -462,6 +463,7 @@ export default function AuthPage() {
           return;
         }
         payload.shop_name = vendorShopName.trim();
+        payload.category = vendorCategory;
         payload.phone_number = vendorPhone.trim();
         payload.upi_id = vendorUpiId.trim() || undefined;
         payload.address = vendorAddress.trim() || undefined;
@@ -648,6 +650,7 @@ export default function AuthPage() {
         const cleanEmail = vendorEmail.trim().toLowerCase();
         await vendorSignup({
           shop_name: vendorShopName.trim(),
+          category: vendorCategory,
           email: cleanEmail,
           phone_number: vendorPhone.trim(),
           upi_id: vendorUpiId.trim() || undefined,
@@ -864,8 +867,8 @@ export default function AuthPage() {
                   roleMode === "admin"
                     ? "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
                     : roleMode === "vendor"
-                    ? "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300"
-                    : "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                    ? "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
+                    : "bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300"
                 }`}>
                   {roleMode}
                 </span>
@@ -960,11 +963,7 @@ export default function AuthPage() {
                   <button
                     type="submit"
                     disabled={!googleModalEmail.trim() || googleLoading}
-                    className={`flex-1 py-2.5 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer ${
-                      roleMode === "vendor"
-                        ? "bg-orange-600 hover:bg-orange-500 shadow-orange-500/20"
-                        : "bg-purple-600 hover:bg-purple-500 shadow-purple-600/20"
-                    }`}
+                    className="flex-1 py-2.5 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer bg-purple-600 hover:bg-purple-500 shadow-purple-600/20"
                   >
                     {googleLoading ? <Loader2 size={14} className="animate-spin" /> : <GoogleIcon className="w-3.5 h-3.5 brightness-200" />}
                     <span>{roleMode === "vendor" ? "Verify Merchant" : "Continue"}</span>
@@ -1127,7 +1126,7 @@ export default function AuthPage() {
                 }}
                 className={`flex items-center justify-center gap-1 py-2 rounded-xl text-xs font-bold transition-all ${
                   roleMode === "vendor"
-                    ? "bg-white dark:bg-gray-900 text-orange-600 dark:text-orange-400 shadow-sm"
+                    ? "bg-white dark:bg-gray-900 text-purple-600 dark:text-purple-400 shadow-sm"
                     : "text-slate-500 hover:text-slate-800"
                 }`}
               >
@@ -1594,7 +1593,7 @@ export default function AuthPage() {
               <>
                 <div>
                   <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-gray-400 mb-1.5">
-                    Shop / Store Name
+                    Shop / Store Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -1603,9 +1602,38 @@ export default function AuthPage() {
                     required
                     value={vendorShopName}
                     onChange={(e) => setVendorShopName(e.target.value)}
-                    className="w-full rounded-2xl border border-orange-200 dark:border-gray-700 bg-white/90 dark:bg-gray-950 text-slate-900 dark:text-white px-4 py-3 outline-none focus:border-orange-500 text-sm font-medium"
+                    className="w-full rounded-2xl border border-purple-200 dark:border-gray-700 bg-white/90 dark:bg-gray-950 text-slate-900 dark:text-white px-4 py-3 outline-none focus:border-purple-500 text-sm font-medium"
                     placeholder="Enter your store / business name"
                   />
+                </div>
+                <div>
+                  <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-gray-400 mb-1.5">
+                    Store / Business Category <span className="text-red-500">*</span>
+                  </label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {[
+                      { id: "grocery", label: "Grocery & Kirana", icon: "🛒" },
+                      { id: "hotel", label: "Hotel & Hospitality", icon: "🏨" },
+                      { id: "restaurant", label: "Restaurant & Eatery", icon: "🍽️" },
+                      { id: "bakery", label: "Bakery & Sweets", icon: "🥖" },
+                      { id: "supermarket", label: "Supermarket & Mart", icon: "🏪" },
+                      { id: "cafe", label: "Cafe & Beverage", icon: "☕" },
+                    ].map((cat) => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setVendorCategory(cat.id)}
+                        className={`flex items-center gap-2 p-3 rounded-xl border text-left text-xs font-bold transition-all cursor-pointer ${
+                          vendorCategory === cat.id
+                            ? "border-purple-600 bg-purple-50 text-purple-800 shadow-sm ring-2 ring-purple-600/20"
+                            : "border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-slate-700 dark:text-gray-300 hover:border-purple-300"
+                        }`}
+                      >
+                        <span className="text-base">{cat.icon}</span>
+                        <span className="truncate">{cat.label}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
@@ -1629,8 +1657,8 @@ export default function AuthPage() {
                     className={`w-full rounded-2xl border ${
                       googleConnectedAccount
                         ? "border-emerald-300 dark:border-emerald-700 bg-emerald-50/40 dark:bg-emerald-950/20 text-emerald-900 dark:text-emerald-200 cursor-not-allowed"
-                        : "border-orange-200 dark:border-gray-700 bg-white/90 dark:bg-gray-950 text-slate-900 dark:text-white"
-                    } px-4 py-3 outline-none focus:border-orange-500 text-sm font-medium`}
+                        : "border-purple-200 dark:border-gray-700 bg-white/90 dark:bg-gray-950 text-slate-900 dark:text-white"
+                    } px-4 py-3 outline-none focus:border-purple-500 text-sm font-medium`}
                     placeholder="vendor@example.com"
                   />
                 </div>
@@ -1645,7 +1673,7 @@ export default function AuthPage() {
                     required
                     value={vendorPhone}
                     onChange={(e) => setVendorPhone(e.target.value)}
-                    className="w-full rounded-2xl border border-orange-200 dark:border-gray-700 bg-white/90 dark:bg-gray-950 text-slate-900 dark:text-white px-4 py-3 outline-none focus:border-orange-500 text-sm font-medium"
+                    className="w-full rounded-2xl border border-purple-200 dark:border-gray-700 bg-white/90 dark:bg-gray-950 text-slate-900 dark:text-white px-4 py-3 outline-none focus:border-purple-500 text-sm font-medium"
                     placeholder="10-digit mobile number"
                   />
                 </div>
@@ -1662,7 +1690,7 @@ export default function AuthPage() {
                     autoComplete="off"
                     value={vendorUpiId}
                     onChange={(e) => setVendorUpiId(e.target.value)}
-                    className="w-full rounded-2xl border border-orange-200 dark:border-gray-700 bg-white/90 dark:bg-gray-950 text-slate-900 dark:text-white px-4 py-3 outline-none focus:border-orange-500 text-sm font-medium"
+                    className="w-full rounded-2xl border border-purple-200 dark:border-gray-700 bg-white/90 dark:bg-gray-950 text-slate-900 dark:text-white px-4 py-3 outline-none focus:border-purple-500 text-sm font-medium"
                     placeholder="e.g. yourbusiness@upi"
                   />
                 </div>
@@ -1682,7 +1710,7 @@ export default function AuthPage() {
                           minLength={6}
                           value={vendorPassword}
                           onChange={(e) => setVendorPassword(e.target.value)}
-                          className="w-full rounded-2xl border border-orange-200 dark:border-gray-700 bg-white/90 dark:bg-gray-950 text-slate-900 dark:text-white px-4 py-3 outline-none focus:border-orange-500 text-sm font-medium"
+                          className="w-full rounded-2xl border border-purple-200 dark:border-gray-700 bg-white/90 dark:bg-gray-950 text-slate-900 dark:text-white px-4 py-3 outline-none focus:border-purple-500 text-sm font-medium"
                           placeholder="Min 6 characters"
                         />
                       </div>
@@ -1698,7 +1726,7 @@ export default function AuthPage() {
                           minLength={6}
                           value={vendorConfirmPassword}
                           onChange={(e) => setVendorConfirmPassword(e.target.value)}
-                          className="w-full rounded-2xl border border-orange-200 dark:border-gray-700 bg-white/90 dark:bg-gray-950 text-slate-900 dark:text-white px-4 py-3 outline-none focus:border-orange-500 text-sm font-medium"
+                          className="w-full rounded-2xl border border-purple-200 dark:border-gray-700 bg-white/90 dark:bg-gray-950 text-slate-900 dark:text-white px-4 py-3 outline-none focus:border-purple-500 text-sm font-medium"
                           placeholder="Repeat password"
                         />
                       </div>
@@ -1709,7 +1737,7 @@ export default function AuthPage() {
                         id="showVendPass"
                         checked={showSignupPassword}
                         onChange={(e) => setShowSignupPassword(e.target.checked)}
-                        className="accent-orange-600 rounded"
+                        className="accent-purple-600 rounded"
                       />
                       <label htmlFor="showVendPass" className="cursor-pointer">Show password text</label>
                     </div>
@@ -1737,8 +1765,8 @@ export default function AuthPage() {
                     Shop Storefront Photo <span className="text-red-500">*</span>
                   </label>
                   <div className="flex items-center gap-2">
-                    <label className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-2xl border-2 border-dashed ${vendorPhotoUrl ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20" : "border-orange-300 dark:border-gray-700 hover:bg-orange-50 dark:hover:bg-gray-800"} cursor-pointer text-xs font-bold text-slate-600 dark:text-gray-300 transition`}>
-                      <UploadCloud size={16} className={vendorPhotoUrl ? "text-emerald-500" : "text-orange-500"} />
+                    <label className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-2xl border-2 border-dashed ${vendorPhotoUrl ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20" : "border-purple-300 dark:border-gray-700 hover:bg-purple-50 dark:hover:bg-gray-800"} cursor-pointer text-xs font-bold text-slate-600 dark:text-gray-300 transition`}>
+                      <UploadCloud size={16} className={vendorPhotoUrl ? "text-emerald-500" : "text-purple-600"} />
                       {uploadingPhoto ? "Uploading Photo..." : vendorPhotoUrl ? "Storefront Photo Uploaded ✓" : "Upload Storefront Photo (Required)"}
                       <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
                     </label>
@@ -1751,8 +1779,8 @@ export default function AuthPage() {
                     Business License / FSSAI / GST Document <span className="text-red-500">*</span>
                   </label>
                   <div className="flex items-center gap-2">
-                    <label className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-2xl border-2 border-dashed ${vendorDocUrl ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20" : "border-orange-300 dark:border-gray-700 hover:bg-orange-50 dark:hover:bg-gray-800"} cursor-pointer text-xs font-bold text-slate-600 dark:text-gray-300 transition`}>
-                      <FileCheck size={16} className={vendorDocUrl ? "text-emerald-500" : "text-orange-500"} />
+                    <label className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-2xl border-2 border-dashed ${vendorDocUrl ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20" : "border-purple-300 dark:border-gray-700 hover:bg-purple-50 dark:hover:bg-gray-800"} cursor-pointer text-xs font-bold text-slate-600 dark:text-gray-300 transition`}>
+                      <FileCheck size={16} className={vendorDocUrl ? "text-emerald-500" : "text-purple-600"} />
                       {uploadingDoc ? "Uploading Document..." : vendorDocUrl ? "Verification Doc Uploaded ✓" : "Upload Verification Doc (PDF/Image) *"}
                       <input type="file" accept=".pdf,image/*" onChange={handleDocUpload} className="hidden" />
                     </label>
@@ -1786,13 +1814,7 @@ export default function AuthPage() {
             <button
               type="submit"
               disabled={submitting || googleLoading || uploadingPhoto || uploadingDoc}
-              className={`w-full text-white font-black py-4 rounded-2xl transition shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer text-sm ${
-                roleMode === "customer"
-                  ? "bg-purple-600 hover:bg-purple-500 shadow-purple-600/25"
-                  : googleConnectedAccount
-                  ? "bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500 hover:from-orange-500 hover:to-amber-500 shadow-orange-500/25 hover:shadow-orange-500/40"
-                  : "bg-orange-600 hover:bg-orange-500 shadow-orange-500/25"
-              }`}
+              className="w-full text-white font-black py-4 rounded-2xl transition shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer text-sm bg-gradient-to-r from-purple-600 via-indigo-600 to-violet-700 hover:from-purple-500 hover:to-indigo-500 shadow-purple-600/25 hover:shadow-purple-600/40"
             >
               {submitting || googleLoading ? (
                 <Loader2 size={18} className="animate-spin" />
@@ -1924,13 +1946,7 @@ export default function AuthPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className={`w-full text-white font-black py-4 rounded-2xl transition shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer text-sm ${
-                    roleMode === "admin"
-                      ? "bg-purple-700 hover:bg-purple-600 shadow-purple-600/30"
-                      : roleMode === "vendor"
-                      ? "bg-orange-600 hover:bg-orange-500 shadow-orange-500/25"
-                      : "bg-purple-600 hover:bg-purple-500 shadow-purple-600/25"
-                  }`}
+                  className="w-full text-white font-black py-4 rounded-2xl transition shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer text-sm bg-gradient-to-r from-purple-600 via-indigo-600 to-violet-700 hover:from-purple-500 hover:to-indigo-500 shadow-purple-600/25 hover:shadow-purple-600/40"
                 >
                   {submitting ? <Loader2 size={18} className="animate-spin" /> : <ShieldCheck size={18} />}
                   {roleMode === "admin" ? "Sign In to Admin Console" : "Sign In"}

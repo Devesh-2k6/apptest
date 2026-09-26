@@ -87,6 +87,7 @@ export async function customerSignup(data: {
 
 export async function vendorSignup(data: {
   shop_name: string;
+  category?: string;
   email: string;
   phone_number: string;
   password?: string;

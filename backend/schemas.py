@@ -61,6 +61,7 @@ class VendorRegisterRequest(BaseModel):
     password: Optional[str] = None
     photo_url: str = Field(..., description="Storefront photo URL from /auth/upload")
     document_url: str = Field(..., description="Business license document URL from /auth/upload")
+    category: Optional[str] = Field("grocery", description="Business category: grocery, hotel, restaurant, bakery, supermarket, cafe")
     address: Optional[str] = "Main Market Location"
     latitude: Optional[float] = 13.0827
     longitude: Optional[float] = 80.2707
@@ -180,6 +181,7 @@ class GoogleAuthRequest(BaseModel):
     role: Optional[str] = "CUSTOMER"
     credential: Optional[str] = None
     shop_name: Optional[str] = None
+    category: Optional[str] = "grocery"
     phone_number: Optional[str] = None
     upi_id: Optional[str] = None
     address: Optional[str] = None
@@ -366,6 +368,7 @@ class ShopBase(BaseModel):
     description: Optional[str] = None
     verification_document_url: Optional[str] = None
     verification_document_name: Optional[str] = None
+    category: Optional[str] = "grocery"
     upi_id: Optional[str] = None
     delivery_enabled: bool = True
     delivery_fee: float = Field(default=0.0, ge=0.0)
@@ -411,6 +414,7 @@ class ShopUpdate(BaseModel):
     description: Optional[str] = None
     verification_document_url: Optional[str] = None
     verification_document_name: Optional[str] = None
+    category: Optional[str] = None
     upi_id: Optional[str] = None
     delivery_enabled: Optional[bool] = None
     delivery_fee: Optional[float] = None
@@ -438,6 +442,7 @@ class ShopResponse(BaseModel):
     latitude: float
     longitude: float
     description: Optional[str] = None
+    category: Optional[str] = "grocery"
     average_rating: float = 0.0
     rating_count: int = 0
     deal_count: Optional[int] = 0

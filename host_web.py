@@ -21,9 +21,9 @@ ROOT_DIR = Path(__file__).resolve().parent
 BACKEND_DIR = ROOT_DIR / "backend"
 
 if hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stdout.reconfigure(encoding="utf-8", line_buffering=True)
 if hasattr(sys.stderr, "reconfigure"):
-    sys.stderr.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8", line_buffering=True)
 
 def get_lan_ip():
     try:
@@ -103,11 +103,10 @@ def main():
         bufsize=1
     )
 
-    # Step 3: Start Next.js Frontend
-    print("\n[3/4] Starting Next.js Web Frontend on http://0.0.0.0:3000...")
-    npm_cmd = "npm.cmd" if sys.platform == "win32" else "npm"
+    # Step 3: Start Web Frontend on Port 3000
+    print("\n[3/4] Starting Web Frontend on http://0.0.0.0:3000...")
     frontend_proc = subprocess.Popen(
-        [npm_cmd, "run", "dev"],
+        [sys.executable, "frontend_server.py", "3000"],
         cwd=str(ROOT_DIR),
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,

@@ -101,10 +101,10 @@ const CONFIG: Record<ToastType, { icon: React.FC<{ size?: number; className?: st
   },
   info: {
     icon: Info,
-    border: "border-blue-200/70 dark:border-blue-500/30",
+    border: "border-purple-200/70 dark:border-purple-500/30",
     bg: "bg-white dark:bg-gray-900",
-    iconClass: "text-blue-500",
-    bar: "bg-blue-500",
+    iconClass: "text-purple-600",
+    bar: "bg-purple-600",
   },
 };
 
@@ -139,7 +139,7 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
         </div>
         <button
           onClick={() => onRemove(toast.id)}
-          className="flex-shrink-0 p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-gray-800 transition"
+          className="flex-shrink-0 p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-gray-800 transition active:scale-90 cursor-pointer"
         >
           <X size={14} />
         </button>

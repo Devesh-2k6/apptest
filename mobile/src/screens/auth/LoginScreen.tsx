@@ -88,6 +88,7 @@ export const LoginScreen: React.FC<AuthScreenProps> = ({ navigation, route }) =>
 
   // Vendor Signup fields
   const [vendorShopName, setVendorShopName] = useState("");
+  const [vendorCategory, setVendorCategory] = useState("grocery");
   const [vendorEmail, setVendorEmail] = useState("");
   const [vendorPhone, setVendorPhone] = useState("");
   const [vendorPassword, setVendorPassword] = useState("");
@@ -439,6 +440,7 @@ export const LoginScreen: React.FC<AuthScreenProps> = ({ navigation, route }) =>
         const cleanEmail = vendorEmail.trim().toLowerCase();
         const res = await vendorSignup({
           shop_name: vendorShopName.trim(),
+          category: vendorCategory,
           email: cleanEmail,
           phone_number: vendorPhone.trim() || "+91 98765 43210",
           password: vendorPassword.trim() || undefined,
@@ -802,8 +804,6 @@ export const LoginScreen: React.FC<AuthScreenProps> = ({ navigation, route }) =>
                       styles.submitBtn,
                       roleMode === "admin"
                         ? { backgroundColor: "#9333ea" }
-                        : roleMode === "vendor"
-                        ? { backgroundColor: "#ea580c" }
                         : { backgroundColor: Colors.primary },
                       submitting && styles.btnDisabled,
                     ]}
@@ -979,6 +979,46 @@ export const LoginScreen: React.FC<AuthScreenProps> = ({ navigation, route }) =>
                   </View>
 
                   <View style={styles.inputGroup}>
+                    <Text style={styles.inputLabel}>STORE / BUSINESS CATEGORY *</Text>
+                    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 4 }}>
+                      {[
+                        { id: "grocery", label: "🛒 Grocery / Kirana" },
+                        { id: "hotel", label: "🏨 Hotel & Hospitality" },
+                        { id: "restaurant", label: "🍽️ Restaurant / Eatery" },
+                        { id: "bakery", label: "🥖 Bakery & Sweets" },
+                        { id: "supermarket", label: "🏪 Supermarket" },
+                        { id: "cafe", label: "☕ Cafe & Beverage" },
+                      ].map((cat) => {
+                        const isSelected = vendorCategory === cat.id;
+                        return (
+                          <TouchableOpacity
+                            key={cat.id}
+                            onPress={() => setVendorCategory(cat.id)}
+                            style={{
+                              paddingHorizontal: 12,
+                              paddingVertical: 8,
+                              borderRadius: 12,
+                              borderWidth: 1.5,
+                              borderColor: isSelected ? Colors.primary : Colors.cardBorder,
+                              backgroundColor: isSelected ? (Colors.primaryLight || "#FAF5FF") : "#FFFFFF",
+                            }}
+                          >
+                            <Text
+                              style={{
+                                fontSize: 12,
+                                fontWeight: "700",
+                                color: isSelected ? Colors.primary : Colors.textPrimary,
+                              }}
+                            >
+                              {cat.label}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  </View>
+
+                  <View style={styles.inputGroup}>
                     <Text style={styles.inputLabel}>VENDOR EMAIL ADDRESS</Text>
                     <View style={styles.inputBox}>
                       <Mail size={16} color={Colors.textMuted} />
@@ -1102,7 +1142,7 @@ export const LoginScreen: React.FC<AuthScreenProps> = ({ navigation, route }) =>
                   />
 
                   <TouchableOpacity
-                    style={[styles.submitBtn, { backgroundColor: "#ea580c" }, submitting && styles.btnDisabled]}
+                    style={[styles.submitBtn, { backgroundColor: Colors.primary }, submitting && styles.btnDisabled]}
                     onPress={handleSignupSubmit}
                     disabled={submitting}
                     activeOpacity={0.85}

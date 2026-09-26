@@ -2,7 +2,13 @@
   "name": "ExpiryGo",
   "description": "Near-expiry grocery deals from local shops to fight food waste and save money.",
   "requestFramePermissions": [
-    "geolocation"
+    "geolocation",
+    "camera",
+    "microphone",
+    "clipboard-read",
+    "clipboard-write",
+    "notifications",
+    "display-capture"
   ],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

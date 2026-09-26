@@ -6,8 +6,8 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 function createShopIcon(isSelected: boolean = false) {
-  const color = isSelected ? "#10b981" : "#FF5B26";
-  const glow = isSelected ? "rgba(16, 185, 129, 0.45)" : "rgba(255, 91, 38, 0.45)";
+  const color = isSelected ? "#10b981" : "#7C3AED";
+  const glow = isSelected ? "rgba(16, 185, 129, 0.45)" : "rgba(124, 58, 237, 0.45)";
   return new L.DivIcon({
     className: "custom-shop-marker",
     html: `
@@ -243,7 +243,7 @@ export default function MapComponent({
           <Polyline
             positions={routeCoords}
             pathOptions={{
-              color: "#FF5B26",
+              color: "#7C3AED",
               weight: 5,
               opacity: 0.9,
               lineJoin: "round",

@@ -12,3 +12,5 @@ if __name__ == "__main__":
     host = os.environ.get("HOST", "0.0.0.0")
     print(f"Starting Meeva API on http://{host}:{port}", flush=True)
     uvicorn.run("main:app", host=host, port=port, reload=False, log_level="info", app_dir=str(backend_dir))
+
+

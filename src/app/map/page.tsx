@@ -235,7 +235,7 @@ export default function MapDiscovery() {
         <div className="flex items-center gap-2">
           <Link
             href="/deals"
-            className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md p-2.5 sm:p-3 rounded-2xl shadow-xl border border-orange-100/80 dark:border-gray-800 transition hover:scale-105 pointer-events-auto text-slate-700 dark:text-gray-200 hover:text-[#FF5B26] shrink-0"
+            className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md p-2.5 sm:p-3 rounded-2xl shadow-xl border border-purple-100/80 dark:border-gray-800 transition hover:scale-105 pointer-events-auto text-slate-700 dark:text-gray-200 hover:text-purple-600 shrink-0"
             aria-label="Back to deals"
           >
             <ArrowLeft size={18} />
@@ -244,7 +244,7 @@ export default function MapDiscovery() {
           {/* Search Form */}
           <form
             onSubmit={handleSearchGeocode}
-            className="flex-1 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-2xl shadow-xl border border-orange-100/80 dark:border-gray-800 flex items-center px-3.5 py-2 pointer-events-auto focus-within:border-[#FF5B26] focus-within:ring-2 focus-within:ring-orange-500/20 transition-all"
+            className="flex-1 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-2xl shadow-xl border border-purple-100/80 dark:border-gray-800 flex items-center px-3.5 py-2 pointer-events-auto focus-within:border-purple-600 focus-within:ring-2 focus-within:ring-purple-500/20 transition-all"
           >
             <Search size={16} className="text-slate-400 mr-2 shrink-0" />
             <input
@@ -447,7 +447,7 @@ export default function MapDiscovery() {
       <div className="absolute bottom-20 left-4 z-[300] bg-white/90 dark:bg-gray-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/60 dark:border-gray-800 shadow-md text-[11px] font-bold text-slate-700 dark:text-gray-300 hidden sm:flex items-center gap-2 pointer-events-none">
         <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block" />
         <span>Your Location</span>
-        <span className="w-2.5 h-2.5 rounded-full bg-[#FF5B26] inline-block ml-2" />
+        <span className="w-2.5 h-2.5 rounded-full bg-purple-600 inline-block ml-2" />
         <span>Surplus Store</span>
       </div>
       <ScrollToTop />

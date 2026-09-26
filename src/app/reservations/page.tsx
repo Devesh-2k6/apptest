@@ -83,12 +83,12 @@ export default function MyReservations() {
       <ShopperLayout>
         <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col items-center justify-center p-6 text-center">
           <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-3xl p-10 max-w-sm shadow-xl">
-            <div className="w-16 h-16 bg-orange-50 dark:bg-orange-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <LogIn size={28} className="text-orange-500" />
+            <div className="w-16 h-16 bg-purple-50 dark:bg-purple-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <LogIn size={28} className="text-purple-600" />
             </div>
             <h2 className="text-xl font-black text-slate-900 dark:text-white mb-2">Sign in to view orders</h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Log in to see your reservations, pickups, and order history.</p>
-            <Link href="/auth?tab=login" className="w-full block bg-[#FF5B26] hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-xl text-center transition shadow-lg shadow-orange-500/20">
+            <Link href="/auth?tab=login" className="w-full block bg-gradient-to-r from-purple-600 via-indigo-600 to-violet-700 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 px-6 rounded-xl text-center transition shadow-lg shadow-purple-500/20">
               Sign In
             </Link>
           </div>

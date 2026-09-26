@@ -53,14 +53,14 @@ export function ShopperLayout({ children }: ShopperLayoutProps) {
         {/* Logo Branding */}
         <div className="h-16 flex items-center px-6 border-b border-zinc-200/70 dark:border-zinc-800/80">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-sm shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-500 text-white flex items-center justify-center shadow-sm shadow-purple-500/20 group-hover:scale-105 transition-transform">
               <Leaf size={16} className="fill-white" />
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-lg font-black tracking-tight text-zinc-900 dark:text-white">
                 Meeva
               </span>
-              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/60 dark:border-emerald-800/40 px-1.5 py-0.5 rounded-md">
+              <span className="text-[10px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/60 border border-purple-200/60 dark:border-purple-800/40 px-1.5 py-0.5 rounded-md">
                 Food
               </span>
             </div>
@@ -79,17 +79,17 @@ export function ShopperLayout({ children }: ShopperLayoutProps) {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all ${
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all active:scale-[0.98] ${
                   isActive
-                    ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm"
-                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
+                    ? "bg-purple-600 text-white dark:bg-purple-600 dark:text-white shadow-sm shadow-purple-600/30"
+                    : "text-zinc-600 dark:text-zinc-400 hover:text-purple-700 dark:hover:text-purple-300 hover:bg-purple-50/60 dark:hover:bg-purple-950/30"
                 }`}
               >
                 <Icon
                   size={17}
                   className={
                     isActive
-                      ? "text-emerald-400 dark:text-emerald-600"
+                      ? "text-white"
                       : "text-zinc-400 dark:text-zinc-500"
                   }
                 />
@@ -106,7 +106,7 @@ export function ShopperLayout({ children }: ShopperLayoutProps) {
             {user?.role === "VENDOR" || user?.is_shop_owner ? (
               <Link
                 href="/shop"
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs text-zinc-600 dark:text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:bg-emerald-950/30 transition-all"
+                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs text-zinc-600 dark:text-zinc-400 hover:text-purple-600 hover:bg-purple-50/60 dark:hover:bg-purple-950/30 transition-all active:scale-[0.98]"
               >
                 <Store size={16} className="text-zinc-400" />
                 <span>Merchant Dashboard</span>
@@ -114,7 +114,7 @@ export function ShopperLayout({ children }: ShopperLayoutProps) {
             ) : (
               <Link
                 href="/shop/setup"
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs text-zinc-600 dark:text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50/60 dark:hover:bg-emerald-950/30 transition-all"
+                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs text-zinc-600 dark:text-zinc-400 hover:text-purple-600 hover:bg-purple-50/60 dark:hover:bg-purple-950/30 transition-all active:scale-[0.98]"
               >
                 <Store size={16} className="text-zinc-400" />
                 <span>Register Store (Partner)</span>
@@ -123,7 +123,7 @@ export function ShopperLayout({ children }: ShopperLayoutProps) {
             {user?.role === "ADMIN" && (
               <Link
                 href="/admin"
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs text-zinc-600 dark:text-zinc-400 hover:text-purple-600 hover:bg-purple-50/60 dark:hover:bg-purple-950/30 transition-all"
+                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-xs text-zinc-600 dark:text-zinc-400 hover:text-purple-600 hover:bg-purple-50/60 dark:hover:bg-purple-950/30 transition-all active:scale-[0.98]"
               >
                 <ShieldCheck size={16} className="text-zinc-400" />
                 <span>Admin Console</span>
@@ -137,7 +137,7 @@ export function ShopperLayout({ children }: ShopperLayoutProps) {
           {isAuthenticated && user ? (
             <>
               <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80">
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-xs flex items-center justify-center shrink-0 border border-emerald-500/20">
+                <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 font-bold text-xs flex items-center justify-center shrink-0 border border-purple-500/20">
                   {initial}
                 </div>
                 <div className="flex-1 min-w-0">

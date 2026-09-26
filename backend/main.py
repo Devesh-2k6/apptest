@@ -140,12 +140,13 @@ async def security_and_rate_limit_middleware(request: Request, call_next):
     response = await call_next(request)
     duration = time.perf_counter() - start_time
 
-    # Inject OWASP Recommended HTTP Security Headers
+    # Inject OWASP Recommended HTTP Security Headers & Permissions Policy
     response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=*, geolocation=*, microphone=*, clipboard-read=*, clipboard-write=*, display-capture=*"
     response.headers["X-Permitted-Cross-Domain-Policies"] = "none"
     response.headers["X-Request-Duration"] = f"{duration * 1000:.2f}ms"
 

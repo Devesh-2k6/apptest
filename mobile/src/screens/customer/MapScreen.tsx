@@ -277,14 +277,14 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
               100% { transform: scale(2.2); opacity: 0; }
             }
             .store-marker {
-              background: #FF5B26;
+              background: #7C3AED;
               color: white;
               border-radius: 18px;
               padding: 5px 9px;
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
               font-size: 11px;
               font-weight: 800;
-              box-shadow: 0 4px 12px rgba(255, 91, 38, 0.45);
+              box-shadow: 0 4px 12px rgba(124, 58, 237, 0.45);
               border: 2px solid white;
               display: flex;
               align-items: center;
@@ -350,7 +350,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
                   if (data && data.routes && data.routes.length > 0) {
                     const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
                     routeLine = L.polyline(coords, {
-                      color: '#FF5B26',
+                      color: '#7C3AED',
                       weight: 5,
                       opacity: 0.9,
                       lineJoin: 'round'
@@ -358,7 +358,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
                     map.fitBounds(routeLine.getBounds(), { padding: [45, 45] });
                   } else {
                     routeLine = L.polyline([[userLat, userLng], [toLat, toLng]], {
-                      color: '#FF5B26',
+                      color: '#7C3AED',
                       weight: 4,
                       opacity: 0.85,
                       dashArray: '6, 6'
@@ -367,7 +367,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({ navigation }) => {
                 })
                 .catch(() => {
                   routeLine = L.polyline([[userLat, userLng], [toLat, toLng]], {
-                    color: '#FF5B26',
+                    color: '#7C3AED',
                     weight: 4,
                     opacity: 0.85,
                     dashArray: '6, 6'

@@ -16,6 +16,11 @@ import {
   X,
   Search,
   AlertTriangle,
+  Zap,
+  ShoppingBag,
+  UtensilsCrossed,
+  Check,
+  Store,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -29,11 +34,218 @@ import { useToast } from "@/components/ui/Toast";
 
 const CATEGORIES: ProductCategory[] = ["BAKERY", "DAIRY", "PRODUCE", "MEAT", "PANTRY", "PREPARED_FOOD", "OTHER"];
 
+interface PresetItem {
+  id: string;
+  name: string;
+  brand: string;
+  category: ProductCategory;
+  originalPrice: number;
+  floorPrice: number;
+  validDays: number;
+  defaultQty: number;
+  description: string;
+  accentColor: string;
+  tag: string;
+  mode: "GROCERY" | "HOTEL";
+  iconText: string;
+}
+
+const PRESET_ITEMS: PresetItem[] = [
+  // Kirana & Supermarket Presets
+  {
+    id: "amul-milk-500",
+    name: "Amul Taaza Toned Milk (500ml)",
+    brand: "Amul Dairy",
+    category: "DAIRY",
+    originalPrice: 27,
+    floorPrice: 18,
+    validDays: 2,
+    defaultQty: 6,
+    description: "Fresh pasteurized toned milk pouch. Chilled and sealed, perfect for tea, coffee, curd, or daily cooking.",
+    accentColor: "#1E3A8A",
+    tag: "Daily Essential",
+    mode: "GROCERY",
+    iconText: "🥛",
+  },
+  {
+    id: "britannia-bread-400",
+    name: "Britannia 100% Whole Wheat Bread (400g)",
+    brand: "Britannia",
+    category: "BAKERY",
+    originalPrice: 55,
+    floorPrice: 30,
+    validDays: 3,
+    defaultQty: 4,
+    description: "Soft sliced whole wheat bread loaf. Ideal for morning toast, sandwiches, and quick healthy snacks.",
+    accentColor: "#78350F",
+    tag: "High Demand",
+    mode: "GROCERY",
+    iconText: "🍞",
+  },
+  {
+    id: "fresh-paneer-200",
+    name: "Fresh Malai Paneer Block (200g)",
+    brand: "Dairy Fresh",
+    category: "DAIRY",
+    originalPrice: 95,
+    floorPrice: 60,
+    validDays: 2,
+    defaultQty: 5,
+    description: "Rich, soft cottage cheese block. High protein content, ready for curries, bhurji, or tikka.",
+    accentColor: "#065F46",
+    tag: "Top Clearance",
+    mode: "GROCERY",
+    iconText: "🧀",
+  },
+  {
+    id: "amul-dahi-400",
+    name: "Amul Masti Dahi Pouch (400g)",
+    brand: "Amul Dairy",
+    category: "DAIRY",
+    originalPrice: 35,
+    floorPrice: 22,
+    validDays: 2,
+    defaultQty: 8,
+    description: "Thick natural set curd prepared from pasteurized toned milk. Chilled and ready to consume.",
+    accentColor: "#1E40AF",
+    tag: "Fast Mover",
+    mode: "GROCERY",
+    iconText: "🥣",
+  },
+  {
+    id: "farm-eggs-6",
+    name: "Farm Fresh White Eggs (6-Pack Carton)",
+    brand: "Farm Fresh",
+    category: "MEAT",
+    originalPrice: 48,
+    floorPrice: 30,
+    validDays: 5,
+    defaultQty: 6,
+    description: "Clean, farm fresh Grade-A eggs packed in secure protective carton. High natural protein.",
+    accentColor: "#92400E",
+    tag: "Essential",
+    mode: "GROCERY",
+    iconText: "🥚",
+  },
+  {
+    id: "aashirvaad-atta-5kg",
+    name: "Aashirvaad Shudh Chakki Atta (5kg)",
+    brand: "Aashirvaad",
+    category: "PANTRY",
+    originalPrice: 260,
+    floorPrice: 195,
+    validDays: 14,
+    defaultQty: 3,
+    description: "100% whole wheat chakki flour with natural dietary fiber. Sealed factory bag.",
+    accentColor: "#B45309",
+    tag: "Pantry Deal",
+    mode: "GROCERY",
+    iconText: "🌾",
+  },
+
+  // Hotel & Restaurant Surplus Presets
+  {
+    id: "deluxe-veg-thali",
+    name: "Deluxe Veg Thali Surplus Box",
+    brand: "Kitchen Partner",
+    category: "PREPARED_FOOD",
+    originalPrice: 160,
+    floorPrice: 80,
+    validDays: 0,
+    defaultQty: 4,
+    description: "Chef-prepared dinner thali: Paneer butter masala, Dal tadka, 3 Tawa rotis, Jeera rice, and Gulab jamun. Hot and hygienically packed.",
+    accentColor: "#EA580C",
+    tag: "Dinner Special",
+    mode: "HOTEL",
+    iconText: "🍱",
+  },
+  {
+    id: "chicken-biryani-box",
+    name: "Dum Biryani Surplus Box (Chicken)",
+    brand: "Royal Kitchen",
+    category: "PREPARED_FOOD",
+    originalPrice: 240,
+    floorPrice: 120,
+    validDays: 0,
+    defaultQty: 3,
+    description: "Aromatic dum biryani cooked with tender chicken pieces, layered basmati rice, served with raita and salan. Fresh kitchen surplus.",
+    accentColor: "#B91C1C",
+    tag: "Chef Special",
+    mode: "HOTEL",
+    iconText: "🍗",
+  },
+  {
+    id: "cafe-bakery-box",
+    name: "Cafe Artisan Bakery & Pastry Box",
+    brand: "Artisan Cafe",
+    category: "BAKERY",
+    originalPrice: 220,
+    floorPrice: 95,
+    validDays: 0,
+    defaultQty: 3,
+    description: "Assorted evening box: 2 Butter croissants, 1 chocolate fudge muffin, and artisanal cookies baked fresh today.",
+    accentColor: "#D97706",
+    tag: "Closing Special",
+    mode: "HOTEL",
+    iconText: "🥐",
+  },
+  {
+    id: "sandwich-combo",
+    name: "Gourmet Club Sandwich & Crispy Fries",
+    brand: "City Bistro",
+    category: "PREPARED_FOOD",
+    originalPrice: 150,
+    floorPrice: 75,
+    validDays: 0,
+    defaultQty: 4,
+    description: "Freshly grilled multi-layered club sandwich with spiced veggies, cheese slice, served with crispy salted fries.",
+    accentColor: "#059669",
+    tag: "Bistro Surplus",
+    mode: "HOTEL",
+    iconText: "🥪",
+  },
+  {
+    id: "paneer-gravy-roti",
+    name: "Paneer Gravy Combo + 3 Butter Rotis",
+    brand: "North Delights",
+    category: "PREPARED_FOOD",
+    originalPrice: 180,
+    floorPrice: 90,
+    validDays: 0,
+    defaultQty: 4,
+    description: "Creamy rich paneer masala curry paired with 3 warm layered butter rotis. Freshly sealed takeaway meal container.",
+    accentColor: "#C2410C",
+    tag: "Hot Meal",
+    mode: "HOTEL",
+    iconText: "🍲",
+  },
+  {
+    id: "indo-chinese-bowl",
+    name: "Wok Fried Rice & Veg Manchurian Bowl",
+    brand: "Wok Express",
+    category: "PREPARED_FOOD",
+    originalPrice: 160,
+    floorPrice: 80,
+    validDays: 0,
+    defaultQty: 3,
+    description: "Wok-tossed vegetable fried rice with crispy vegetable Manchurian balls in rich garlic soya gravy. Hot dinner surplus.",
+    accentColor: "#7C3AED",
+    tag: "Quick Box",
+    mode: "HOTEL",
+    iconText: "🥡",
+  },
+];
+
 export default function AddProductPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { user, isAuthenticated, isLoading } = useAuth();
   const [shop, setShop] = useState<ShopWithDescription | null>(null);
+
+  // Quick Preset Shelf State
+  const [presetMode, setPresetMode] = useState<"GROCERY" | "HOTEL">("GROCERY");
+  const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
+  const [isApplyingPreset, setIsApplyingPreset] = useState(false);
 
   // Redirect if not authenticated or not shop owner
   useEffect(() => {
@@ -162,6 +374,175 @@ export default function AddProductPage() {
       setError("AI optimization failed: " + getErrorMessage(err));
     } finally {
       setIsOptimizing(false);
+    }
+  };
+
+  const handleSelectPreset = async (preset: PresetItem) => {
+    try {
+      setIsApplyingPreset(true);
+      setSelectedPresetId(preset.id);
+      setError("");
+
+      const now = new Date();
+      let mfgStr = "";
+      let expStr = "";
+
+      if (preset.validDays === 0) {
+        // Same-day restaurant surplus (dinner/lunch clearance)
+        const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        mfgStr = yesterday.toISOString().split("T")[0];
+        expStr = now.toISOString().split("T")[0];
+      } else {
+        mfgStr = now.toISOString().split("T")[0];
+        const expDate = new Date(now.getTime() + preset.validDays * 24 * 60 * 60 * 1000);
+        expStr = expDate.toISOString().split("T")[0];
+      }
+
+      setProductName(preset.name);
+      setCategory(preset.category);
+      setOriginalPrice(preset.originalPrice.toString());
+      setAutoDiscountMinPrice(preset.floorPrice.toString());
+      setAutoDiscountEnabled(true);
+      setQuantity(preset.defaultQty.toString());
+      setManufacturingDate(mfgStr);
+      setExpiryDate(expStr);
+      setDescription(preset.description);
+
+      // Generate branded client-side product assets
+      if (typeof window !== "undefined") {
+        // 1. Front card canvas
+        const canvasF = document.createElement("canvas");
+        canvasF.width = 600;
+        canvasF.height = 600;
+        const ctxF = canvasF.getContext("2d");
+        if (ctxF) {
+          const grad = ctxF.createLinearGradient(0, 0, 600, 600);
+          grad.addColorStop(0, "#0B1120");
+          grad.addColorStop(1, preset.accentColor);
+          ctxF.fillStyle = grad;
+          ctxF.fillRect(0, 0, 600, 600);
+
+          ctxF.beginPath();
+          ctxF.arc(300, 300, 210, 0, Math.PI * 2);
+          ctxF.fillStyle = "rgba(255, 255, 255, 0.04)";
+          ctxF.fill();
+
+          // Header tag
+          ctxF.fillStyle = "rgba(255, 255, 255, 0.12)";
+          if (ctxF.roundRect) ctxF.roundRect(40, 40, 220, 40, 10);
+          else ctxF.fillRect(40, 40, 220, 40);
+          ctxF.fill();
+          ctxF.fillStyle = "#F8FAFC";
+          ctxF.font = "bold 15px sans-serif";
+          ctxF.fillText(preset.mode === "GROCERY" ? "🛒 MEEVA INSTAMART" : "🍽️ MEEVA FOOD", 55, 65);
+
+          // Verified tag
+          ctxF.fillStyle = "rgba(16, 185, 129, 0.25)";
+          if (ctxF.roundRect) ctxF.roundRect(380, 40, 180, 40, 10);
+          else ctxF.fillRect(380, 40, 180, 40);
+          ctxF.fill();
+          ctxF.fillStyle = "#10B981";
+          ctxF.font = "bold 14px sans-serif";
+          ctxF.fillText("✓ VERIFIED RESCUE", 400, 65);
+
+          // Brand
+          ctxF.fillStyle = "#94A3B8";
+          ctxF.font = "bold 20px sans-serif";
+          ctxF.fillText(preset.brand.toUpperCase(), 40, 200);
+
+          // Title
+          ctxF.fillStyle = "#FFFFFF";
+          ctxF.font = "bold 32px sans-serif";
+          const words = preset.name.split(" ");
+          let line = "";
+          let y = 250;
+          for (let n = 0; n < words.length; n++) {
+            const test = line + words[n] + " ";
+            if (ctxF.measureText(test).width > 500 && n > 0) {
+              ctxF.fillText(line, 40, y);
+              line = words[n] + " ";
+              y += 42;
+            } else {
+              line = test;
+            }
+          }
+          ctxF.fillText(line, 40, y);
+
+          // MRP & Floor bar
+          ctxF.fillStyle = "rgba(0, 0, 0, 0.5)";
+          if (ctxF.roundRect) ctxF.roundRect(40, 410, 520, 75, 16);
+          else ctxF.fillRect(40, 410, 520, 75);
+          ctxF.fill();
+          ctxF.fillStyle = "#94A3B8";
+          ctxF.font = "bold 16px sans-serif";
+          ctxF.fillText(`MRP: ₹${preset.originalPrice}`, 65, 454);
+          ctxF.fillStyle = "#34D399";
+          ctxF.font = "bold 20px sans-serif";
+          ctxF.fillText(`CLEARANCE FLOOR: ₹${preset.floorPrice}`, 260, 454);
+
+          // Footer
+          ctxF.fillStyle = "#38BDF8";
+          ctxF.font = "bold 15px sans-serif";
+          ctxF.fillText("⚡ 1-TAP INVENTORY PRESET  •  VERIFIED STOCK", 40, 545);
+
+          const frontDataUrl = canvasF.toDataURL("image/jpeg", 0.92);
+          setFrontImage(frontDataUrl);
+
+          canvasF.toBlob((blob) => {
+            if (blob) {
+              const file = new File([blob], `${preset.id}_front.jpg`, { type: "image/jpeg" });
+              setFrontImageFile(file);
+            }
+          }, "image/jpeg", 0.92);
+        }
+
+        // 2. Expiry stamp canvas
+        const canvasE = document.createElement("canvas");
+        canvasE.width = 600;
+        canvasE.height = 400;
+        const ctxE = canvasE.getContext("2d");
+        if (ctxE) {
+          ctxE.fillStyle = "#0F172A";
+          ctxE.fillRect(0, 0, 600, 400);
+
+          ctxE.strokeStyle = "#334155";
+          ctxE.lineWidth = 4;
+          ctxE.strokeRect(20, 20, 560, 360);
+
+          ctxE.fillStyle = "#64748B";
+          ctxE.font = "bold 16px monospace";
+          ctxE.fillText("MEEVA QUALITY ASSURANCE & DATE STAMP", 40, 70);
+
+          ctxE.fillStyle = "#E2E8F0";
+          ctxE.font = "bold 24px sans-serif";
+          ctxE.fillText(preset.name, 40, 130);
+
+          ctxE.fillStyle = "#F87171";
+          ctxE.font = "bold 32px monospace";
+          ctxE.fillText(`USE BY / EXP: ${expStr}`, 40, 210);
+
+          ctxE.fillStyle = "#10B981";
+          ctxE.font = "18px monospace";
+          ctxE.fillText("✓ VERIFIED MERCHANT SURPLUS BATCH", 40, 280);
+
+          const expDataUrl = canvasE.toDataURL("image/jpeg", 0.92);
+          setExpiryImage(expDataUrl);
+
+          canvasE.toBlob((blob) => {
+            if (blob) {
+              const file = new File([blob], `${preset.id}_expiry.jpg`, { type: "image/jpeg" });
+              setExpiryImageFile(file);
+            }
+          }, "image/jpeg", 0.92);
+        }
+      }
+
+      toast.success("Preset Loaded!", `Auto-filled details for "${preset.name}". Adjust quantity or floor price and publish in seconds.`);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load preset", "Could not generate preset assets.");
+    } finally {
+      setIsApplyingPreset(false);
     }
   };
 
@@ -364,6 +745,132 @@ export default function AddProductPage() {
               {error}
             </motion.div>
           )}
+
+          {/* ⚡ 1-Tap Quick Presets Shelf */}
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center flex-shrink-0">
+                  <Zap size={22} className="animate-pulse" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-base font-black text-gray-900 dark:text-white">
+                      1-Tap Quick Presets
+                    </h2>
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400">
+                      10s Fast Listing
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Tap any common surplus item to instantly populate name, MRP, floor price & images
+                  </p>
+                </div>
+              </div>
+
+              {/* Mode Switcher */}
+              <div className="flex items-center bg-gray-100 dark:bg-gray-800/80 p-1 rounded-2xl self-start sm:self-auto border border-gray-200/50 dark:border-gray-700/50">
+                <button
+                  type="button"
+                  onClick={() => setPresetMode("GROCERY")}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    presetMode === "GROCERY"
+                      ? "bg-white dark:bg-gray-900 text-emerald-600 dark:text-emerald-400 shadow-sm"
+                      : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  }`}
+                >
+                  <ShoppingBag size={14} />
+                  <span>🛒 Kirana / Groceries</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPresetMode("HOTEL")}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    presetMode === "HOTEL"
+                      ? "bg-white dark:bg-gray-900 text-purple-600 dark:text-purple-400 shadow-sm"
+                      : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  }`}
+                >
+                  <UtensilsCrossed size={14} />
+                  <span>🍽️ Hotel / Meals</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Presets Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
+              {PRESET_ITEMS.filter((p) => p.mode === presetMode).map((preset) => {
+                const isSelected = selectedPresetId === preset.id;
+                const discountPct = Math.round(((preset.originalPrice - preset.floorPrice) / preset.originalPrice) * 100);
+
+                return (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    disabled={isApplyingPreset}
+                    onClick={() => handleSelectPreset(preset)}
+                    className={`group relative text-left p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
+                      isSelected
+                        ? "bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-500 dark:border-emerald-500/60 ring-2 ring-emerald-500/30 shadow-md"
+                        : "bg-gray-50/50 dark:bg-gray-800/40 border-gray-200/70 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/70"
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-1 mb-2">
+                        <span className="text-xl">{preset.iconText}</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200/60 dark:border-gray-700/60">
+                            {preset.tag}
+                          </span>
+                          {isSelected && (
+                            <span className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center">
+                              <Check size={12} strokeWidth={3} />
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <h3 className="text-xs font-bold text-gray-900 dark:text-white line-clamp-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
+                        {preset.name}
+                      </h3>
+                      <p className="text-[11px] text-gray-400 font-medium">
+                        {preset.brand} &bull; {preset.validDays === 0 ? "Expiring Tonight" : `~${preset.validDays} Days Life`}
+                      </p>
+                    </div>
+
+                    <div className="mt-3 pt-2.5 border-t border-gray-200/50 dark:border-gray-800/80 flex items-center justify-between">
+                      <div>
+                        <span className="text-[10px] text-gray-400 line-through mr-1.5">
+                          ₹{preset.originalPrice}
+                        </span>
+                        <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">
+                          ₹{preset.floorPrice}
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                        {discountPct}% OFF
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {selectedPresetId && (
+              <div className="flex items-center justify-between text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-3.5 py-2 rounded-xl border border-emerald-500/20">
+                <span className="flex items-center gap-1.5 font-bold">
+                  <Check size={14} /> Preset applied! Images & dates auto-filled.
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedPresetId(null)}
+                  className="text-xs font-bold underline hover:opacity-80"
+                >
+                  Clear Selection
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Product Info Section */}
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 space-y-4 shadow-sm">

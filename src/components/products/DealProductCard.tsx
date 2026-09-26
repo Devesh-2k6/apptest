@@ -117,10 +117,10 @@ export const DealProductCard = React.memo(function DealProductCardBase({
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.04, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      className="bg-white dark:bg-[#0F141F] rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 p-3 shadow-xs hover:shadow-xl hover:shadow-black/5 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300 relative flex flex-col gap-3 group"
+      transition={{ delay: Math.min(index * 0.02, 0.15), duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+      className="bg-white dark:bg-[#0F141F] rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 p-3 shadow-xs hover:shadow-xl hover:shadow-purple-500/5 hover:border-purple-300 dark:hover:border-purple-800/50 transition-[transform,box-shadow,border-color] duration-200 ease-out transform-gpu relative flex flex-col gap-3 group"
     >
       {/* ── Top Hero Image Container ── */}
       <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800/80">
@@ -129,7 +129,7 @@ export const DealProductCard = React.memo(function DealProductCardBase({
           alt={name}
           fill
           sizes="(max-width: 768px) 100vw, 400px"
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
+          className="object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
           onError={() => setImgSrc(getSafeImageUrl(null, name, category))}
         />
 
@@ -255,10 +255,10 @@ export const DealProductCard = React.memo(function DealProductCardBase({
               <button
                 type="button"
                 onClick={(e) => (onQuickRecipe ? onQuickRecipe(id, e) : onToggleRecipeBasket?.(id, e))}
-                className="h-8 px-2.5 rounded-lg bg-zinc-100 hover:bg-zinc-200/70 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 font-semibold text-xs flex items-center gap-1 transition cursor-pointer"
+                className="h-8 px-2.5 rounded-lg bg-zinc-100 hover:bg-zinc-200/70 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 font-semibold text-xs flex items-center gap-1 transition active:scale-95 cursor-pointer"
                 title="AI Recipe for this item"
               >
-                <Sparkles size={11} className="text-emerald-500" />
+                <Sparkles size={11} className="text-purple-600 dark:text-purple-400" />
                 <span className="text-[11px]">Recipe</span>
               </button>
             )}

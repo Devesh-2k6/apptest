@@ -7,17 +7,17 @@ export const Colors = {
   cardSurface: "#F3F4F6",
   cardBorder: "#ECEFF2",
   cardBorderSubtle: "#F2F4F7",
-  cardBorderHighlight: "rgba(255, 91, 38, 0.3)",
-  cardBorderGlow: "rgba(255, 91, 38, 0.15)",
+  cardBorderHighlight: "rgba(124, 58, 237, 0.3)",
+  cardBorderGlow: "rgba(124, 58, 237, 0.15)",
 
-  // Signature Accent (Vibrant Coral / Tangerine Orange from Mockup)
-  primary: "#FF5B26",
-  primaryHover: "#E54B18",
-  primaryBright: "#FF6E3D",
-  primaryLight: "#FFF0EB",
-  primaryGlow: "rgba(255, 91, 38, 0.25)",
-  primaryGradientStart: "#FF6E3D",
-  primaryGradientEnd: "#FF5B26",
+  // Signature Accent (Royal Violet Purple & White Minimalist Theme)
+  primary: "#7C3AED",
+  primaryHover: "#6D28D9",
+  primaryBright: "#9333EA",
+  primaryLight: "#F5F3FF",
+  primaryGlow: "rgba(124, 58, 237, 0.25)",
+  primaryGradientStart: "#9333EA",
+  primaryGradientEnd: "#7C3AED",
 
   // Modern Accent Palette
   amber: "#F59E0B",
@@ -77,7 +77,7 @@ export const Shadows = {
     elevation: 3,
   },
   hover: {
-    shadowColor: "#FF5B26",
+    shadowColor: "#7C3AED",
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
     shadowRadius: 20,

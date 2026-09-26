@@ -488,6 +488,7 @@ def vendor_register(
     shop_lat = getattr(body, "latitude", None) if getattr(body, "latitude", None) is not None else 13.0827
     shop_lon = getattr(body, "longitude", None) if getattr(body, "longitude", None) is not None else 80.2707
 
+    vendor_cat = (getattr(body, "category", None) or "grocery").strip().lower()
     shop = db.query(Shop).filter(Shop.owner_id == user.id).first()
     if not shop:
         shop = Shop(
@@ -502,6 +503,8 @@ def vendor_register(
             photo_url=body.photo_url,
             document_url=body.document_url,
             verification_document_url=body.document_url,
+            category=vendor_cat,
+            location_verification_category=vendor_cat,
             upi_id=body.upi_id.strip() if getattr(body, "upi_id", None) else None,
         )
         db.add(shop)
@@ -514,6 +517,8 @@ def vendor_register(
         shop.photo_url = body.photo_url
         shop.document_url = body.document_url
         shop.verification_document_url = body.document_url
+        shop.category = vendor_cat
+        shop.location_verification_category = vendor_cat
         if getattr(body, "upi_id", None) and body.upi_id.strip():
             shop.upi_id = body.upi_id.strip()
     db.commit()
@@ -793,6 +798,7 @@ def google_auth(body: schemas.GoogleAuthRequest, db: Annotated[Session, Depends(
             shop_lat = body.latitude if body.latitude is not None else 13.0827
             shop_lon = body.longitude if body.longitude is not None else 80.2707
 
+            vendor_cat = (getattr(body, "category", None) or "grocery").strip().lower()
             shop = Shop(
                 owner_id=user.id,
                 name=shop_name,
@@ -805,6 +811,8 @@ def google_auth(body: schemas.GoogleAuthRequest, db: Annotated[Session, Depends(
                 photo_url=body.photo_url or "",
                 document_url=body.document_url or "",
                 verification_document_url=body.document_url or "",
+                category=vendor_cat,
+                location_verification_category=vendor_cat,
                 upi_id=body.upi_id.strip() if body.upi_id else None,
             )
             db.add(shop)
