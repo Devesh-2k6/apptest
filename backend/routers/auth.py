@@ -757,26 +757,85 @@ def run_smtp_diagnostic(to_email: str = Query(..., description="Target email add
 
 
 
+def verify_google_oauth_token(credential: str) -> dict:
+    """
+    Cryptographically validates Google ID token or OAuth access token directly with Google Identity servers.
+    Returns payload containing verified 'email', 'name', etc., or raises None if invalid.
+    """
+    if not credential or not isinstance(credential, str) or len(credential.strip()) < 10:
+        return None
+
+    import urllib.request
+    import urllib.parse
+    import json
+
+    # 1. Try Google TokenInfo (for ID Tokens / JWTs)
+    try:
+        url = f"https://oauth2.googleapis.com/tokeninfo?id_token={urllib.parse.quote(credential.strip())}"
+        req = urllib.request.Request(url, headers={"User-Agent": "Meeva-Backend-Auth/1.0"})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            if resp.status == 200:
+                data = json.loads(resp.read().decode("utf-8"))
+                if data.get("email") and (data.get("email_verified") is True or str(data.get("email_verified")).lower() == "true"):
+                    return data
+    except Exception:
+        pass
+
+    # 2. Try Google UserInfo (for OAuth 2.0 Access Tokens)
+    try:
+        url = "https://www.googleapis.com/oauth2/v3/userinfo"
+        req = urllib.request.Request(url, headers={
+            "Authorization": f"Bearer {credential.strip()}",
+            "User-Agent": "Meeva-Backend-Auth/1.0"
+        })
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            if resp.status == 200:
+                data = json.loads(resp.read().decode("utf-8"))
+                if data.get("email"):
+                    return data
+    except Exception:
+        pass
+
+    return None
+
+
 @router.post("/google", response_model=schemas.AuthResponse)
 def google_auth(body: schemas.GoogleAuthRequest, db: Annotated[Session, Depends(get_db)]):
     """
-    Unified Google Authentication Endpoint:
-    - 1-Click login and instant onboarding.
-    - If email matches ADMIN_EMAIL (devpant2006@gmail.com): assigns ADMIN role.
-    - If CUSTOMER: auto-registers/logs in with verified status.
-    - If VENDOR: auto-registers/logs in and provisions merchant store with details if provided.
-    - Issues standard JWT token and returns AuthResponse.
+    Strict Production Google Authentication Endpoint:
+    - Cryptographically verifies the Google OAuth token directly with Google Identity servers.
+    - Strictly rejects any unauthenticated, missing, or fabricated tokens.
+    - Uses only the verified email address returned directly by Google.
+    - Admins must authenticate via password login.
     """
-    clean_email = body.email.strip().lower()
-    user_name = body.name.strip() if body.name and body.name.strip() else clean_email.split("@")[0].title()
+    if not body.credential or not body.credential.strip():
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Google Authentication failed: Valid Google OAuth token required. Please sign in through Google or use your email and password."
+        )
+
+    google_data = verify_google_oauth_token(body.credential)
+    if not google_data or not google_data.get("email"):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Google Authentication failed: Invalid or expired Google OAuth token."
+        )
+
+    # Strictly use the verified email confirmed by Google servers
+    clean_email = google_data["email"].strip().lower()
+    user_name = google_data.get("name") or (body.name.strip() if body.name and body.name.strip() else clean_email.split("@")[0].title())
     
     admin_env_email = os.getenv("ADMIN_EMAIL", "").strip().lower() or settings.ADMIN_EMAIL.strip().lower()
-    is_admin = (clean_email == admin_env_email and body.role == "ADMIN")
+    if clean_email == admin_env_email or body.role == "ADMIN":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Platform Administrator must authenticate using administrator credentials and password."
+        )
 
     user = db.query(User).filter(User.email == clean_email).first()
 
     if not user:
-        role = "ADMIN" if is_admin else ("VENDOR" if body.role == "VENDOR" else "CUSTOMER")
+        role = "VENDOR" if body.role == "VENDOR" else "CUSTOMER"
         is_vendor = (role == "VENDOR")
 
         user = User(
@@ -819,24 +878,17 @@ def google_auth(body: schemas.GoogleAuthRequest, db: Annotated[Session, Depends(
             db.commit()
             db.refresh(shop)
 
-            if not is_admin:
-                threading.Thread(
-                    target=send_vendor_application_received_email,
-                    kwargs={"to_email": user.email, "vendor_name": user.name, "shop_name": shop.name},
-                    daemon=True,
-                ).start()
-                loc_thread = threading.Thread(
-                    target=_run_async_location_verification,
-                    args=(shop.id, shop.name, shop.address, shop.latitude, shop.longitude),
-                    daemon=True,
-                )
-                loc_thread.start()
-            else:
-                threading.Thread(
-                    target=send_vendor_approval_email,
-                    kwargs={"to_email": user.email, "vendor_name": user.name, "shop_name": shop.name},
-                    daemon=True,
-                ).start()
+            threading.Thread(
+                target=send_vendor_application_received_email,
+                kwargs={"to_email": user.email, "vendor_name": user.name, "shop_name": shop.name},
+                daemon=True,
+            ).start()
+            loc_thread = threading.Thread(
+                target=_run_async_location_verification,
+                args=(shop.id, shop.name, shop.address, shop.latitude, shop.longitude),
+                daemon=True,
+            )
+            loc_thread.start()
         elif role == "CUSTOMER":
             threading.Thread(
                 target=send_customer_welcome_email,
@@ -845,10 +897,7 @@ def google_auth(body: schemas.GoogleAuthRequest, db: Annotated[Session, Depends(
             ).start()
     else:
         user.email_verified = True
-        if is_admin:
-            user.role = "ADMIN"
-            user.is_shop_owner = False
-        elif body.role == "VENDOR":
+        if body.role == "VENDOR":
             if not user.is_shop_owner:
                 user.role = "VENDOR"
                 user.is_shop_owner = True

@@ -179,14 +179,11 @@ export default function AuthPage() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // Google Authentication States (1-Click Emergent-style flow)
+  // Google Authentication States (Strict Production OAuth)
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [showGoogleModal, setShowGoogleModal] = useState(false);
   const [googleCustomClientId, setGoogleCustomClientId] = useState("");
   const [showClientIdConfig, setShowClientIdConfig] = useState(false);
-  const [googleModalEmail, setGoogleModalEmail] = useState("");
-  const [googleModalName, setGoogleModalName] = useState("");
-  const [googleConnectedAccount, setGoogleConnectedAccount] = useState<{ email: string; name: string } | null>(null);
+  const [googleConnectedAccount, setGoogleConnectedAccount] = useState<{ email: string; name: string; credential: string } | null>(null);
 
   // Initialize official Google Identity Services (One Tap & OAuth 2.0)
   useEffect(() => {
@@ -203,6 +200,7 @@ export default function AuthPage() {
         (window as any).google.accounts.id.initialize({
           client_id: savedClientId,
           callback: (response: any) => {
+            if (!response?.credential) return;
             try {
               const base64Url = response.credential.split(".")[1];
               const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
@@ -213,9 +211,9 @@ export default function AuthPage() {
                   .join("")
               );
               const payload = JSON.parse(jsonPayload);
-              handleGoogleSignIn(payload.email, payload.name, payload.picture);
+              handleGoogleSignIn(response.credential, payload.email, payload.name, payload.picture);
             } catch {
-              handleGoogleSignIn();
+              handleGoogleSignIn(response.credential);
             }
           },
         });
@@ -327,7 +325,13 @@ export default function AuthPage() {
   };
 
   const handleGoogleSignInClick = async () => {
-    // 1. If Google OAuth Client ID is configured, trigger Google's native popup (App Emergent style)
+    // Admin accounts must authenticate with admin credentials and password
+    if (roleMode === "admin") {
+      setError("Administrator accounts must authenticate using administrator email and password.");
+      return;
+    }
+
+    // 1. If Google OAuth Client ID is configured, trigger Google's native popup
     const activeClientId =
       googleCustomClientId ||
       process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
@@ -341,7 +345,7 @@ export default function AuthPage() {
           scope: "email profile openid",
           callback: async (tokenResponse: any) => {
             if (tokenResponse?.error) {
-              setError(tokenResponse.error_description || "Google authorization cancelled.");
+              setError(tokenResponse.error_description || "Google authorization was cancelled.");
               setGoogleLoading(false);
               return;
             }
@@ -352,7 +356,7 @@ export default function AuthPage() {
                 });
                 const googleProfile = await infoRes.json();
                 if (googleProfile?.email) {
-                  await handleGoogleSignIn(googleProfile.email, googleProfile.name, googleProfile.picture);
+                  await handleGoogleSignIn(tokenResponse.access_token, googleProfile.email, googleProfile.name, googleProfile.picture);
                   return;
                 }
               } catch (err) {
@@ -371,59 +375,28 @@ export default function AuthPage() {
       }
     }
 
-    // 2. Check if user already typed an email into any email input
-    const typedEmail = (
-      roleMode === "customer"
-        ? (customerEmail.trim() || loginEmail.trim())
-        : roleMode === "vendor"
-        ? (vendorEmail.trim() || loginEmail.trim())
-        : loginEmail.trim()
-    );
-
-    if (typedEmail && typedEmail.includes("@")) {
-      const typedName =
-        (roleMode === "customer" ? customerName.trim() : vendorShopName.trim()) ||
-        typedEmail.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
-      await handleGoogleSignIn(typedEmail, typedName);
-      return;
-    }
-
-    // 3. If Admin tab, 1-click admin login
-    if (roleMode === "admin") {
-      await handleGoogleSignIn("devpant2006@gmail.com", "Devesh S");
-      return;
-    }
-
-    // 4. For Customer / Vendor with no email entered yet, open the Google account prompt
-    setGoogleModalEmail("");
-    setGoogleModalName("");
-    setShowGoogleModal(true);
+    // STRICT PRODUCTION GUARD: No fake email bypasses allowed
+    setError("Google One-Click Sign In requires configuring NEXT_PUBLIC_GOOGLE_CLIENT_ID. Please sign in using your verified Email & Password below, or configure your Google Client ID.");
+    setShowClientIdConfig(true);
   };
 
   const handleGoogleSignIn = async (
+    credentialToken: string,
     targetEmail?: string,
     targetName?: string,
     targetPicture?: string
   ) => {
-    const email = (
-      targetEmail ||
-      (googleConnectedAccount ? googleConnectedAccount.email : "") ||
-      (roleMode === "admin" ? "devpant2006@gmail.com" : "")
-    ).trim().toLowerCase();
-
-    if (!email || !email.includes("@")) {
-      setShowGoogleModal(true);
+    if (!credentialToken || !credentialToken.trim()) {
+      setError("Google authentication requires a verified Google OAuth token.");
       return;
     }
 
-    const name =
-      targetName ||
-      (googleConnectedAccount?.name) ||
-      email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+    const email = (targetEmail || (googleConnectedAccount ? googleConnectedAccount.email : "")).trim().toLowerCase();
+    const name = targetName || (googleConnectedAccount?.name) || (email ? email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) : "User");
 
-    // For Vendor Sign Up: if merchant details not yet filled, connect the account first with 1-click
+    // For Vendor Sign Up: if merchant details not yet filled, connect the verified Google identity
     if (tab === "signup" && roleMode === "vendor" && !googleConnectedAccount && !vendorShopName.trim()) {
-      setGoogleConnectedAccount({ email, name });
+      setGoogleConnectedAccount({ email, name, credential: credentialToken });
       setVendorEmail(email);
       setCustomerName(name);
       return;
@@ -433,12 +406,12 @@ export default function AuthPage() {
     setError("");
 
     try {
-      const isPlatformAdmin = roleMode === "admin" && email === "devpant2006@gmail.com";
       const payload: GoogleAuthInput = {
         email,
         name,
         picture: targetPicture,
-        role: isPlatformAdmin ? "ADMIN" : (roleMode === "vendor" ? "VENDOR" : "CUSTOMER"),
+        credential: credentialToken,
+        role: roleMode === "vendor" ? "VENDOR" : "CUSTOMER",
       };
 
       if (tab === "signup" && roleMode === "vendor") {
@@ -476,7 +449,7 @@ export default function AuthPage() {
       const res = await googleAuth(payload);
       loginUser(res.user, res.access_token);
 
-      if (res.user.role === "ADMIN" || email === "devpant2006@gmail.com") {
+      if (res.user.role === "ADMIN") {
         router.replace("/admin");
       } else if (res.user.role === "VENDOR" || res.user.is_shop_owner) {
         router.replace("/shop");
@@ -484,7 +457,7 @@ export default function AuthPage() {
         router.replace("/deals");
       }
     } catch (err: unknown) {
-      setError(getErrorMessage(err));
+      setError(getErrorMessage(err) || "Google authentication failed. Please sign in with email and password.");
     } finally {
       setGoogleLoading(false);
     }
@@ -620,7 +593,7 @@ export default function AuthPage() {
             setSubmitting(false);
             return;
           }
-          await handleGoogleSignIn(googleConnectedAccount.email, googleConnectedAccount.name);
+          await handleGoogleSignIn(googleConnectedAccount.credential, googleConnectedAccount.email, googleConnectedAccount.name);
           return;
         }
 
@@ -833,190 +806,6 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50/60 via-[#F8FAFC] to-purple-50/40 dark:from-gray-950 dark:via-gray-900 dark:to-purple-950/40 flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden transition-colors">
-      {/* Google Authentication Dialog */}
-      {showGoogleModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4 animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-gray-800">
-              <div className="flex items-center gap-2.5">
-                <GoogleIcon className="w-5 h-5" />
-                <span className="font-bold text-sm text-slate-800 dark:text-white">
-                  Sign in with Google
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowGoogleModal(false)}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-lg transition cursor-pointer"
-                title="Close"
-              >
-                <X size={16} />
-              </button>
-            </div>
-
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-black text-slate-900 dark:text-white">
-                  {roleMode === "admin"
-                    ? "Admin Google Sign In"
-                    : roleMode === "vendor"
-                    ? "Merchant Google Identity"
-                    : "Shopper Google Sign In"}
-                </h3>
-                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase ${
-                  roleMode === "admin"
-                    ? "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
-                    : roleMode === "vendor"
-                    ? "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
-                    : "bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300"
-                }`}>
-                  {roleMode}
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 dark:text-gray-400">
-                Continue to <strong className="text-purple-600">Meeva</strong> as {roleMode}
-              </p>
-            </div>
-
-            {roleMode === "admin" ? (
-              /* Admin 1-Click Shortcut */
-              <div className="space-y-3 pt-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowGoogleModal(false);
-                    handleGoogleSignIn("devpant2006@gmail.com", "Devesh S");
-                  }}
-                  disabled={googleLoading}
-                  className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-purple-50 hover:bg-purple-100/80 dark:bg-purple-950/40 dark:hover:bg-purple-900/50 border border-purple-200 dark:border-purple-800 text-left cursor-pointer transition shadow-xs group"
-                >
-                  <div className="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm group-hover:scale-105 transition-transform">
-                    D
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                        Platform Admin
-                      </p>
-                      <span className="text-[10px] font-black px-1.5 py-0.2 rounded-md bg-purple-200 dark:bg-purple-900 text-purple-800 dark:text-purple-300">
-                        1-Click
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-500 dark:text-gray-400 truncate">
-                      devpant2006@gmail.com
-                    </p>
-                  </div>
-                  <ArrowRight size={16} className="text-purple-600 dark:text-purple-400 group-hover:translate-x-0.5 transition-transform" />
-                </button>
-              </div>
-            ) : (
-              /* Customer & Vendor Real Google Account Prompt */
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const targetEm = googleModalEmail.trim().toLowerCase();
-                  if (!targetEm || !targetEm.includes("@")) {
-                    setError("Please enter a valid Google email address.");
-                    return;
-                  }
-                  setShowGoogleModal(false);
-                  handleGoogleSignIn(targetEm, googleModalName.trim() || undefined);
-                }}
-                className="space-y-3 pt-1"
-              >
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-gray-300 mb-1">
-                    Your Google Email (@gmail.com) <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    autoFocus
-                    placeholder="e.g. yourname@gmail.com"
-                    value={googleModalEmail}
-                    onChange={(e) => setGoogleModalEmail(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-2xl text-xs outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 text-slate-900 dark:text-white font-medium"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-gray-300 mb-1">
-                    Full Name <span className="text-slate-400 font-normal">(Optional)</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Your Full Name"
-                    value={googleModalName}
-                    onChange={(e) => setGoogleModalName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-2xl text-xs outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 text-slate-900 dark:text-white font-medium"
-                  />
-                </div>
-
-                <div className="flex gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => setShowGoogleModal(false)}
-                    className="flex-1 py-2.5 bg-slate-100 dark:bg-gray-800 hover:bg-slate-200 dark:hover:bg-gray-700 text-slate-700 dark:text-gray-300 rounded-xl text-xs font-bold transition cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={!googleModalEmail.trim() || googleLoading}
-                    className="flex-1 py-2.5 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer bg-purple-600 hover:bg-purple-500 shadow-purple-600/20"
-                  >
-                    {googleLoading ? <Loader2 size={14} className="animate-spin" /> : <GoogleIcon className="w-3.5 h-3.5 brightness-200" />}
-                    <span>{roleMode === "vendor" ? "Verify Merchant" : "Continue"}</span>
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* Collapsible Google Cloud Client ID for Native Emergent Popup */}
-            <div className="pt-2 border-t border-slate-100 dark:border-gray-800">
-              <button
-                type="button"
-                onClick={() => setShowClientIdConfig(!showClientIdConfig)}
-                className="text-[11px] font-semibold text-purple-600 dark:text-purple-400 hover:underline w-full text-center py-0.5 transition cursor-pointer flex items-center justify-center gap-1"
-              >
-                <span>⚙️ {showClientIdConfig ? "Hide Client ID Setup" : "Connect Google Client ID (Native Popup)"}</span>
-              </button>
-
-              {showClientIdConfig && (
-                <div className="space-y-2 pt-2">
-                  <p className="text-[10px] text-slate-500 dark:text-gray-400 leading-relaxed">
-                    Paste your Google Cloud OAuth Client ID below to trigger Google's native popup across all browsers (same as App Emergent):
-                  </p>
-                  <input
-                    type="text"
-                    placeholder="xxxxxxxxxxxx.apps.googleusercontent.com"
-                    value={googleCustomClientId}
-                    onChange={(e) => {
-                      setGoogleCustomClientId(e.target.value);
-                      if (typeof window !== "undefined") {
-                        localStorage.setItem("EXPIRYGO_GOOGLE_CLIENT_ID", e.target.value.trim());
-                      }
-                    }}
-                    className="w-full px-3 py-1.5 bg-slate-50 dark:bg-gray-950 border border-slate-200 dark:border-gray-800 rounded-xl text-xs outline-none focus:border-purple-500 text-slate-900 dark:text-white"
-                  />
-                  <div className="flex justify-between items-center text-[10px] text-slate-400">
-                    <span>Saved in browser</span>
-                    <a
-                      href="https://console.cloud.google.com/apis/credentials"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-purple-600 dark:text-purple-400 font-bold hover:underline"
-                    >
-                      Get Free Client ID →
-                    </a>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Brand Header */}
       <div className="w-full max-w-md bg-white/95 dark:bg-gray-900/90 backdrop-blur-2xl rounded-3xl border border-purple-100/70 dark:border-gray-800 shadow-2xl p-6 sm:p-8 space-y-6 relative z-10">
         <div className="text-center space-y-2">
@@ -1207,19 +996,39 @@ export default function AuthPage() {
               </button>
             )}
 
-            {/* Direct 1-Click Fast Pass Note & Options */}
+            {/* Official Google OAuth Setup Toggle */}
             <div className="flex items-center justify-between px-1 text-[11px] text-slate-400">
-              <span className="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400">
-                <Sparkles size={12} /> 1-Click Fast Login Active
+              <span className="flex items-center gap-1 font-medium text-slate-500 dark:text-gray-400">
+                <ShieldCheck size={12} className="text-purple-600" /> Official Google OAuth 2.0
               </span>
               <button
                 type="button"
-                onClick={() => setShowGoogleModal(true)}
+                onClick={() => setShowClientIdConfig(!showClientIdConfig)}
                 className="hover:underline hover:text-purple-600 dark:hover:text-purple-400 font-medium cursor-pointer"
               >
-                Account options / Settings
+                {showClientIdConfig ? "Hide Client ID" : "Configure Client ID"}
               </button>
             </div>
+
+            {showClientIdConfig && (
+              <div className="p-3 bg-purple-50/60 dark:bg-purple-950/30 border border-purple-200/70 dark:border-purple-800/50 rounded-2xl space-y-2 text-left animate-in fade-in duration-150">
+                <p className="text-[11px] text-slate-600 dark:text-gray-300">
+                  Google One-Click Sign In uses official Google OAuth. Enter your Google Cloud Client ID below or configure <code className="px-1 py-0.5 bg-purple-100 dark:bg-purple-900 rounded font-mono text-[10px]">NEXT_PUBLIC_GOOGLE_CLIENT_ID</code> in <code className="px-1 py-0.5 bg-purple-100 dark:bg-purple-900 rounded font-mono text-[10px]">.env</code>:
+                </p>
+                <input
+                  type="text"
+                  placeholder="xxxxxxxxxxxx.apps.googleusercontent.com"
+                  value={googleCustomClientId}
+                  onChange={(e) => {
+                    setGoogleCustomClientId(e.target.value);
+                    if (typeof window !== "undefined") {
+                      localStorage.setItem("EXPIRYGO_GOOGLE_CLIENT_ID", e.target.value.trim());
+                    }
+                  }}
+                  className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-purple-200 dark:border-gray-700 rounded-xl text-xs outline-none focus:border-purple-500 text-slate-900 dark:text-white"
+                />
+              </div>
+            )}
 
             {/* Subtle Divider */}
             <div className="relative flex py-1 items-center">
@@ -1747,13 +1556,13 @@ export default function AuthPage() {
                     <ShieldCheck className="text-emerald-600 dark:text-emerald-400 shrink-0" size={24} />
                     <div className="text-xs">
                       <p className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                        Password & OTP Verification Bypassed
+                        Google OAuth Verified Identity
                         <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-300">
-                          Google Verified
+                          OAuth 2.0
                         </span>
                       </p>
                       <p className="text-slate-500 dark:text-gray-400 mt-0.5">
-                        Your merchant identity is securely authenticated via {googleConnectedAccount.email}. Fill your store details below and register instantly.
+                        Your merchant identity is verified with Google via {googleConnectedAccount.email}. Complete your storefront details below to finish registration.
                       </p>
                     </div>
                   </div>
